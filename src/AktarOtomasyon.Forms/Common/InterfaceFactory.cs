@@ -6,6 +6,8 @@ using AktarOtomasyon.Stok.Interface;
 using AktarOtomasyon.Stok.Service;
 using AktarOtomasyon.Siparis.Interface;
 using AktarOtomasyon.Siparis.Service;
+using AktarOtomasyon.Satis.Interface;
+using AktarOtomasyon.Satis.Service;
 using AktarOtomasyon.Ai.Interface;
 using AktarOtomasyon.Ai.Service;
 using AktarOtomasyon.Template.Interface;
@@ -37,6 +39,9 @@ namespace AktarOtomasyon.Forms.Common
 
         // Siparis
         public static ISiparisInterface Siparis { get { return new SiparisService(); } }
+
+        // Satis
+        public static ISatisInterface Satis { get { return new SatisService(); } }
 
         // AI
         public static IAiInterface Ai { get { return new AiService(); } }

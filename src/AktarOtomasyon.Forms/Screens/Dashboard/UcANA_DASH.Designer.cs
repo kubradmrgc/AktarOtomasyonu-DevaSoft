@@ -44,6 +44,16 @@ namespace AktarOtomasyon.Forms.Screens.Dashboard
             this.pnlCenter = new DevExpress.XtraEditors.PanelControl();
             this.splitContainerControl1 = new DevExpress.XtraEditors.SplitContainerControl();
             this.grpChart = new DevExpress.XtraEditors.GroupControl();
+            this.pnlKritikBars = new DevExpress.XtraEditors.PanelControl();
+            this.lblKritikBar1 = new DevExpress.XtraEditors.LabelControl();
+            this.lblKritikBar1Qty = new DevExpress.XtraEditors.LabelControl();
+            this.prgKritik1 = new DevExpress.XtraEditors.ProgressBarControl();
+            this.lblKritikBar2 = new DevExpress.XtraEditors.LabelControl();
+            this.lblKritikBar2Qty = new DevExpress.XtraEditors.LabelControl();
+            this.prgKritik2 = new DevExpress.XtraEditors.ProgressBarControl();
+            this.lblKritikBar3 = new DevExpress.XtraEditors.LabelControl();
+            this.lblKritikBar3Qty = new DevExpress.XtraEditors.LabelControl();
+            this.prgKritik3 = new DevExpress.XtraEditors.ProgressBarControl();
             this.chartSalesTrend = new DevExpress.XtraCharts.ChartControl();
             this.grpBildirimlerGrid = new DevExpress.XtraEditors.GroupControl();
             this.grdBildirimler = new DevExpress.XtraGrid.GridControl();
@@ -87,6 +97,11 @@ namespace AktarOtomasyon.Forms.Screens.Dashboard
             this.splitContainerControl1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.grpChart)).BeginInit();
             this.grpChart.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pnlKritikBars)).BeginInit();
+            this.pnlKritikBars.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.prgKritik1.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.prgKritik2.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.prgKritik3.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.chartSalesTrend)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(xyDiagram1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.grpBildirimlerGrid)).BeginInit();
@@ -445,12 +460,118 @@ namespace AktarOtomasyon.Forms.Screens.Dashboard
             this.grpChart.Appearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(217)))), ((int)(((byte)(212)))), ((int)(((byte)(202)))));
             this.grpChart.Appearance.Options.UseBorderColor = true;
             this.grpChart.Controls.Add(this.chartSalesTrend);
+            this.grpChart.Controls.Add(this.pnlKritikBars);
             this.grpChart.Dock = System.Windows.Forms.DockStyle.Fill;
             this.grpChart.Location = new System.Drawing.Point(0, 0);
             this.grpChart.Name = "grpChart";
             this.grpChart.Size = new System.Drawing.Size(570, 460);
             this.grpChart.TabIndex = 1;
             this.grpChart.Text = "Satış Trendi ve Stok Durumu";
+            // 
+            // pnlKritikBars
+            // 
+            this.pnlKritikBars.BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.NoBorder;
+            this.pnlKritikBars.Controls.Add(this.lblKritikBar1);
+            this.pnlKritikBars.Controls.Add(this.lblKritikBar1Qty);
+            this.pnlKritikBars.Controls.Add(this.prgKritik1);
+            this.pnlKritikBars.Controls.Add(this.lblKritikBar2);
+            this.pnlKritikBars.Controls.Add(this.lblKritikBar2Qty);
+            this.pnlKritikBars.Controls.Add(this.prgKritik2);
+            this.pnlKritikBars.Controls.Add(this.lblKritikBar3);
+            this.pnlKritikBars.Controls.Add(this.lblKritikBar3Qty);
+            this.pnlKritikBars.Controls.Add(this.prgKritik3);
+            this.pnlKritikBars.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.pnlKritikBars.Location = new System.Drawing.Point(2, 338);
+            this.pnlKritikBars.Name = "pnlKritikBars";
+            this.pnlKritikBars.Padding = new System.Windows.Forms.Padding(8, 6, 8, 8);
+            this.pnlKritikBars.Size = new System.Drawing.Size(566, 120);
+            this.pnlKritikBars.TabIndex = 1;
+            // 
+            // lblKritikBar1
+            // 
+            this.lblKritikBar1.Location = new System.Drawing.Point(12, 8);
+            this.lblKritikBar1.Name = "lblKritikBar1";
+            this.lblKritikBar1.Size = new System.Drawing.Size(63, 13);
+            this.lblKritikBar1.TabIndex = 0;
+            this.lblKritikBar1.Text = "Kritik ürün 1";
+            // 
+            // lblKritikBar1Qty
+            // 
+            this.lblKritikBar1Qty.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.lblKritikBar1Qty.Appearance.Options.UseTextOptions = true;
+            this.lblKritikBar1Qty.Appearance.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Far;
+            this.lblKritikBar1Qty.Location = new System.Drawing.Point(480, 8);
+            this.lblKritikBar1Qty.Name = "lblKritikBar1Qty";
+            this.lblKritikBar1Qty.Size = new System.Drawing.Size(6, 13);
+            this.lblKritikBar1Qty.TabIndex = 1;
+            this.lblKritikBar1Qty.Text = "-";
+            // 
+            // prgKritik1
+            // 
+            this.prgKritik1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.prgKritik1.Location = new System.Drawing.Point(12, 26);
+            this.prgKritik1.Name = "prgKritik1";
+            this.prgKritik1.Properties.Maximum = 100;
+            this.prgKritik1.Properties.ShowTitle = false;
+            this.prgKritik1.Size = new System.Drawing.Size(542, 10);
+            this.prgKritik1.TabIndex = 2;
+            // 
+            // lblKritikBar2
+            // 
+            this.lblKritikBar2.Location = new System.Drawing.Point(12, 44);
+            this.lblKritikBar2.Name = "lblKritikBar2";
+            this.lblKritikBar2.Size = new System.Drawing.Size(63, 13);
+            this.lblKritikBar2.TabIndex = 3;
+            this.lblKritikBar2.Text = "Kritik ürün 2";
+            // 
+            // lblKritikBar2Qty
+            // 
+            this.lblKritikBar2Qty.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.lblKritikBar2Qty.Location = new System.Drawing.Point(480, 44);
+            this.lblKritikBar2Qty.Name = "lblKritikBar2Qty";
+            this.lblKritikBar2Qty.Size = new System.Drawing.Size(6, 13);
+            this.lblKritikBar2Qty.TabIndex = 4;
+            this.lblKritikBar2Qty.Text = "-";
+            // 
+            // prgKritik2
+            // 
+            this.prgKritik2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.prgKritik2.Location = new System.Drawing.Point(12, 62);
+            this.prgKritik2.Name = "prgKritik2";
+            this.prgKritik2.Properties.Maximum = 100;
+            this.prgKritik2.Properties.ShowTitle = false;
+            this.prgKritik2.Size = new System.Drawing.Size(542, 10);
+            this.prgKritik2.TabIndex = 5;
+            // 
+            // lblKritikBar3
+            // 
+            this.lblKritikBar3.Location = new System.Drawing.Point(12, 80);
+            this.lblKritikBar3.Name = "lblKritikBar3";
+            this.lblKritikBar3.Size = new System.Drawing.Size(63, 13);
+            this.lblKritikBar3.TabIndex = 6;
+            this.lblKritikBar3.Text = "Kritik ürün 3";
+            // 
+            // lblKritikBar3Qty
+            // 
+            this.lblKritikBar3Qty.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.lblKritikBar3Qty.Location = new System.Drawing.Point(480, 80);
+            this.lblKritikBar3Qty.Name = "lblKritikBar3Qty";
+            this.lblKritikBar3Qty.Size = new System.Drawing.Size(6, 13);
+            this.lblKritikBar3Qty.TabIndex = 7;
+            this.lblKritikBar3Qty.Text = "-";
+            // 
+            // prgKritik3
+            // 
+            this.prgKritik3.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.prgKritik3.Location = new System.Drawing.Point(12, 98);
+            this.prgKritik3.Name = "prgKritik3";
+            this.prgKritik3.Properties.Maximum = 100;
+            this.prgKritik3.Properties.ShowTitle = false;
+            this.prgKritik3.Size = new System.Drawing.Size(542, 10);
+            this.prgKritik3.TabIndex = 8;
             // 
             // chartSalesTrend
             // 
@@ -463,7 +584,7 @@ namespace AktarOtomasyon.Forms.Screens.Dashboard
             this.chartSalesTrend.Legend.Visibility = DevExpress.Utils.DefaultBoolean.False;
             this.chartSalesTrend.Location = new System.Drawing.Point(2, 23);
             this.chartSalesTrend.Name = "chartSalesTrend";
-            this.chartSalesTrend.Size = new System.Drawing.Size(566, 435);
+            this.chartSalesTrend.Size = new System.Drawing.Size(566, 315);
             this.chartSalesTrend.TabIndex = 0;
             // 
             // grpBildirimlerGrid
@@ -727,6 +848,12 @@ namespace AktarOtomasyon.Forms.Screens.Dashboard
             this.splitContainerControl1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.grpChart)).EndInit();
             this.grpChart.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.pnlKritikBars)).EndInit();
+            this.pnlKritikBars.ResumeLayout(false);
+            this.pnlKritikBars.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.prgKritik1.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.prgKritik2.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.prgKritik3.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(xyDiagram1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.chartSalesTrend)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.grpBildirimlerGrid)).EndInit();
@@ -772,6 +899,16 @@ namespace AktarOtomasyon.Forms.Screens.Dashboard
         private DevExpress.XtraEditors.PanelControl pnlCenter;
         private DevExpress.XtraEditors.SplitContainerControl splitContainerControl1;
         private DevExpress.XtraEditors.GroupControl grpChart;
+        private DevExpress.XtraEditors.PanelControl pnlKritikBars;
+        private DevExpress.XtraEditors.LabelControl lblKritikBar1;
+        private DevExpress.XtraEditors.LabelControl lblKritikBar1Qty;
+        private DevExpress.XtraEditors.ProgressBarControl prgKritik1;
+        private DevExpress.XtraEditors.LabelControl lblKritikBar2;
+        private DevExpress.XtraEditors.LabelControl lblKritikBar2Qty;
+        private DevExpress.XtraEditors.ProgressBarControl prgKritik2;
+        private DevExpress.XtraEditors.LabelControl lblKritikBar3;
+        private DevExpress.XtraEditors.LabelControl lblKritikBar3Qty;
+        private DevExpress.XtraEditors.ProgressBarControl prgKritik3;
         private DevExpress.XtraCharts.ChartControl chartSalesTrend;
         private DevExpress.XtraEditors.GroupControl grpBildirimlerGrid;
         private DevExpress.XtraGrid.GridControl grdBildirimler;

@@ -1,9 +1,11 @@
 using System;
+using System.Data;
 using System.Drawing;
 using System.Windows.Forms;
 using AktarOtomasyon.Forms.Common;
 using AktarOtomasyon.Forms.Managers;
 using AktarOtomasyon.Forms.Helpers;
+using AktarOtomasyon.Util.DataAccess;
 using DevExpress.XtraBars.Navigation;
 
 namespace AktarOtomasyon.Forms
@@ -48,6 +50,7 @@ namespace AktarOtomasyon.Forms
                 UpdateStatusBar();
                 ApplyMenuPermissions(); // NEW: Apply permission-based menu visibility
                 ApplyModernSidebarTheme(); // Apply modern theme to sidebar
+                UpdateSidebarBadges();
                 NavigationManager.OpenScreen("ANA_DASH", this);
             }
             catch (Exception ex)
@@ -231,6 +234,82 @@ namespace AktarOtomasyon.Forms
             {
                 ErrorManager.LogMessage(string.Format("ApplyModernSidebarTheme error: {0}", ex.Message), "MAIN");
             }
+        }
+
+        /// <summary>
+        /// Sidebar accordion öğelerine kritik stok / bekleyen sipariş / AI onay rozetleri ekler.
+        /// </summary>
+        private void UpdateSidebarBadges()
+        {
+            try
+            {
+                int kritikAdet = 0;
+                int bekleyenSiparis = 0;
+                int aiOnay = 0;
+
+                try
+                {
+                    var kritikListe = InterfaceFactory.Stok.KritikListele();
+                    kritikAdet = kritikListe != null ? kritikListe.Count : 0;
+                }
+                catch (Exception ex)
+                {
+                    ErrorManager.LogMessage(string.Format("Sidebar kritik badge error: {0}", ex.Message), "MAIN");
+                }
+
+                try
+                {
+                    using (var sMan = new SqlManager())
+                    {
+                        var cmd = sMan.CreateCommand("sp_dash_bekleyen_siparis_ozet");
+                        var dt = sMan.ExecuteQuery(cmd);
+                        if (dt != null && dt.Rows.Count > 0)
+                        {
+                            var row = dt.Rows[0];
+                            bekleyenSiparis =
+                                Convert.ToInt32(row["taslak_adet"]) +
+                                Convert.ToInt32(row["gonderildi_adet"]) +
+                                Convert.ToInt32(row["kismi_adet"]);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ErrorManager.LogMessage(string.Format("Sidebar siparis badge error: {0}", ex.Message), "MAIN");
+                }
+
+                try
+                {
+                    using (var sMan = new SqlManager())
+                    {
+                        var cmd = sMan.CreateCommand(
+                            "SELECT COUNT(*) FROM [dbo].[ai_urun_icerik] WHERE [durum] IN ('TASLAK', 'ONAY_BEKLIYOR')",
+                            CommandType.Text);
+                        var result = sMan.ExecuteScalar(cmd);
+                        if (result != null && result != DBNull.Value)
+                            aiOnay = Convert.ToInt32(result);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ErrorManager.LogMessage(string.Format("Sidebar AI badge error: {0}", ex.Message), "MAIN");
+                }
+
+                accordionControlElement_StokKritik.Text = FormatBadgeText("Kritik Stok", kritikAdet);
+                accordionControlElement_Siparisler.Text = FormatBadgeText("Siparişler", bekleyenSiparis);
+                accordionControlElement_AI.Text = FormatBadgeText("AI İçerik", aiOnay);
+            }
+            catch (Exception ex)
+            {
+                ErrorManager.LogMessage(string.Format("UpdateSidebarBadges error: {0}", ex.Message), "MAIN");
+            }
+        }
+
+        private static string FormatBadgeText(string baseText, int count)
+        {
+            return count > 0
+                ? string.Format("{0} ({1})", baseText, count)
+                : baseText;
         }
 
         /// <summary>

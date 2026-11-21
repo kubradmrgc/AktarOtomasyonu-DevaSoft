@@ -5,7 +5,7 @@ using System.Windows.Forms;
 using AktarOtomasyon.Forms.Base;
 using AktarOtomasyon.Forms.Common;
 using AktarOtomasyon.Forms.Managers;
-using AktarOtomasyon.Stok.Interface;
+using AktarOtomasyon.Satis.Interface;
 using AktarOtomasyon.Urun.Interface;
 
 namespace AktarOtomasyon.Forms.Screens.Satis
@@ -140,36 +140,38 @@ namespace AktarOtomasyon.Forms.Screens.Satis
             {
                 try
                 {
-                    bool error = false;
+                    var model = new SatisModel
+                    {
+                        OdemeTip = "NAKIT",
+                        KullaniciId = SessionManager.IsAuthenticated ? (int?)SessionManager.KullaniciId : null,
+                        Aciklama = "Perakende Satış"
+                    };
+
                     foreach (var item in _sepet)
                     {
-                        var hareket = new StokHareketModel
+                        model.Detaylar.Add(new SatisDetayModel
                         {
                             UrunId = item.UrunId,
-                            HareketTip = "CIKIS",
+                            UrunAdi = item.UrunAdi,
                             Miktar = item.Miktar,
-                            Aciklama = "Perakende Satış",
-                            HareketTarih = DateTime.Now
-                            // Referans fields can be used for Order ID if we had a Sales Table
-                        };
-
-                        var result = InterfaceFactory.Stok.HareketEkle(hareket);
-                        if (result != null)
-                        {
-                            MessageHelper.ShowError(string.Format("{0} için hata: {1}", item.UrunAdi, result));
-                            error = true;
-                        }
+                            BirimFiyat = item.SatisFiyati,
+                            Tutar = item.ToplamTutar
+                        });
                     }
 
-                    if (!error)
+                    var result = InterfaceFactory.Satis.SatisKaydet(model);
+                    if (result != null)
                     {
-                        MessageHelper.ShowInfo("Satış başarıyla tamamlandı.");
-                        _sepet.Clear();
-                        RefreshSepet();
-                        _aktifUrun = null;
-                        lblUrunAdi.Text = "Ürün Seçilmedi";
-                        lblFiyat.Text = "0,00 ₺";
+                        MessageHelper.ShowError(result);
+                        return;
                     }
+
+                    MessageHelper.ShowInfo("Satış başarıyla tamamlandı.");
+                    _sepet.Clear();
+                    RefreshSepet();
+                    _aktifUrun = null;
+                    lblUrunAdi.Text = "Ürün Seçilmedi";
+                    lblFiyat.Text = "0,00 ₺";
                 }
                 catch (Exception ex)
                 {

@@ -115,6 +115,14 @@
       <Project>{4a123456-789a-bcde-3456-890123456789}</Project>
       <Name>AktarOtomasyon.Siparis.Service</Name>
     </ProjectReference>
+    <ProjectReference Include="..\AktarOtomasyon.Satis.Interface\AktarOtomasyon.Satis.Interface.csproj">
+      <Project>{7A111111-2222-3333-4444-555555555501}</Project>
+      <Name>AktarOtomasyon.Satis.Interface</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\AktarOtomasyon.Satis.Service\AktarOtomasyon.Satis.Service.csproj">
+      <Project>{7A111111-2222-3333-4444-555555555502}</Project>
+      <Name>AktarOtomasyon.Satis.Service</Name>
+    </ProjectReference>
     <ProjectReference Include="..\AktarOtomasyon.Stok.Service\AktarOtomasyon.Stok.Service.csproj">
       <Project>{28901234-5678-9abc-1234-678901234567}</Project>
       <Name>AktarOtomasyon.Stok.Service</Name>

@@ -44,6 +44,7 @@ namespace AktarOtomasyon.Forms.Screens.Dashboard
                 LoadBugunSatisWidget();
                 LoadSonHareketlerWidget();
                 SetupSalesTrendChart();
+                LoadKritikStokBars();
             }
             catch (Exception ex)
             {
@@ -343,23 +344,39 @@ namespace AktarOtomasyon.Forms.Screens.Dashboard
                         return;
                     }
 
-                    var cmd = sMan.CreateCommand(
-                        "SELECT ISNULL(SUM([toplam_tutar]), 0) FROM [dbo].[satis] WHERE CONVERT(date, [satis_tarih]) = CONVERT(date, GETDATE())",
-                        CommandType.Text);
-                    var result = sMan.ExecuteScalar(cmd);
-                    var total = result != null && result != DBNull.Value ? Convert.ToDecimal(result) : 0m;
+                    var cmd = sMan.CreateCommand("sp_dash_bugun_satis_ozet");
+                    var dt = sMan.ExecuteQuery(cmd);
+                    if (dt == null || dt.Rows.Count == 0)
+                    {
+                        lblTotalUrunCount.Text = "₺0";
+                        lblTotalUrunDesc.Text = "Bugün satış yok";
+                        return;
+                    }
 
-                    lblTotalUrunCount.Text = total > 0
-                        ? total.ToString("C0", new CultureInfo("tr-TR"))
-                        : "₺0";
-                    lblTotalUrunDesc.Text = total > 0 ? "Bugünkü ciro" : "Bugün satış yok";
+                    var row = dt.Rows[0];
+                    var culture = new CultureInfo("tr-TR");
+                    decimal bugunCiro = Convert.ToDecimal(row["bugun_ciro"]);
+                    int fisAdet = Convert.ToInt32(row["fis_adet"]);
+                    decimal ortSepet = Convert.ToDecimal(row["ort_sepet"]);
+                    decimal yuzde = Convert.ToDecimal(row["yuzde_degisim"]);
+
+                    lblTotalUrunCount.Text = bugunCiro.ToString("C0", culture);
+                    lblTotalUrunDesc.Text = string.Format(
+                        culture,
+                        "{0} fiş • Ort. sepet {1:C0} • {2}{3:0.#}%",
+                        fisAdet,
+                        ortSepet,
+                        yuzde >= 0 ? "+" : "",
+                        yuzde);
+                    lblTotalUrunCount.Appearance.ForeColor = ModernTheme.Colors.Primary;
+                    lblTotalUrunCount.Appearance.Options.UseForeColor = true;
                 }
             }
             catch (Exception ex)
             {
                 ErrorManager.LogMessage(string.Format("LoadBugunSatisWidget error: {0}", ex.Message), "DASHBOARD");
                 lblTotalUrunCount.Text = "₺—";
-                lblTotalUrunDesc.Text = "Veri yakında";
+                lblTotalUrunDesc.Text = "Veri alınamadı";
             }
         }
 
@@ -378,14 +395,43 @@ namespace AktarOtomasyon.Forms.Screens.Dashboard
             chartSalesTrend.Series.Clear();
 
             var series = new Series("Satış", ViewType.Bar);
-            var culture = new CultureInfo("tr-TR");
-            var today = DateTime.Today;
+            decimal ortalama = 0m;
 
-            for (int i = 6; i >= 0; i--)
+            try
             {
-                var date = today.AddDays(-i);
-                var value = i == 0 ? 42 : 12 + ((date.Day * 7) % 28);
-                series.Points.Add(new SeriesPoint(culture.DateTimeFormat.GetAbbreviatedDayName(date.DayOfWeek), value));
+                using (var sMan = new SqlManager())
+                {
+                    if (!TableExists(sMan, "satis"))
+                    {
+                        SetupFallbackChart(series);
+                    }
+                    else
+                    {
+                        var cmd = sMan.CreateCommand("sp_dash_gunluk_satis_trend");
+                        cmd.Parameters.AddWithValue("@gun", 7);
+                        var dt = sMan.ExecuteQuery(cmd);
+
+                        if (dt != null && dt.Rows.Count > 0)
+                        {
+                            foreach (DataRow row in dt.Rows)
+                            {
+                                string gunAdi = Convert.ToString(row["gun_adi"]);
+                                decimal ciro = Convert.ToDecimal(row["ciro"]);
+                                ortalama = Convert.ToDecimal(row["ortalama_ciro"]);
+                                series.Points.Add(new SeriesPoint(gunAdi, Convert.ToDouble(ciro)));
+                            }
+                        }
+                        else
+                        {
+                            SetupFallbackChart(series);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ErrorManager.LogMessage(string.Format("SetupSalesTrendChart error: {0}", ex.Message), "DASHBOARD");
+                SetupFallbackChart(series);
             }
 
             var view = series.View as SideBySideBarSeriesView;
@@ -408,10 +454,89 @@ namespace AktarOtomasyon.Forms.Screens.Dashboard
                 diagram.AxisX.GridLines.Visible = false;
                 diagram.AxisY.GridLines.Color = ModernTheme.Colors.Border;
                 diagram.AxisY.WholeRange.AlwaysShowZeroLevel = true;
+                diagram.AxisY.ConstantLines.Clear();
+
+                if (ortalama > 0)
+                {
+                    var hedef = new ConstantLine("Hedef", Convert.ToDouble(ortalama));
+                    hedef.Color = ModernTheme.Colors.Terracotta;
+                    hedef.LineStyle.DashStyle = DashStyle.Dash;
+                    hedef.Title.Text = string.Format(new CultureInfo("tr-TR"), "Hedef {0:C0}", ortalama);
+                    hedef.Title.TextColor = ModernTheme.Colors.OnTerracottaSoft;
+                    diagram.AxisY.ConstantLines.Add(hedef);
+                }
             }
 
             if (series.Points.Count > 0)
                 series.Points[series.Points.Count - 1].Color = ModernTheme.Colors.Primary;
+        }
+
+        private void SetupFallbackChart(Series series)
+        {
+            var culture = new CultureInfo("tr-TR");
+            var today = DateTime.Today;
+            for (int i = 6; i >= 0; i--)
+            {
+                var date = today.AddDays(-i);
+                series.Points.Add(new SeriesPoint(
+                    culture.DateTimeFormat.GetAbbreviatedDayName(date.DayOfWeek),
+                    0));
+            }
+        }
+
+        private void LoadKritikStokBars()
+        {
+            try
+            {
+                ResetKritikBar(lblKritikBar1, lblKritikBar1Qty, prgKritik1, "—", "-", 0, false);
+                ResetKritikBar(lblKritikBar2, lblKritikBar2Qty, prgKritik2, "—", "-", 0, false);
+                ResetKritikBar(lblKritikBar3, lblKritikBar3Qty, prgKritik3, "—", "-", 0, false);
+
+                using (var sMan = new SqlManager())
+                {
+                    var cmd = sMan.CreateCommand("sp_dash_kritik_stok_liste");
+                    cmd.Parameters.AddWithValue("@limit", 3);
+                    var dt = sMan.ExecuteQuery(cmd);
+                    if (dt == null || dt.Rows.Count == 0)
+                        return;
+
+                    for (int i = 0; i < dt.Rows.Count && i < 3; i++)
+                    {
+                        var row = dt.Rows[i];
+                        string ad = Convert.ToString(row["urun_adi"]);
+                        decimal mevcut = Convert.ToDecimal(row["mevcut_stok"]);
+                        decimal oran = Convert.ToDecimal(row["oran"]);
+                        int pct = (int)Math.Max(0, Math.Min(100, Math.Round(oran)));
+                        string qty = string.Format(new CultureInfo("tr-TR"), "{0:0.##}", mevcut);
+                        bool kritik = oran < 50;
+
+                        if (i == 0) ResetKritikBar(lblKritikBar1, lblKritikBar1Qty, prgKritik1, ad, qty, pct, kritik);
+                        else if (i == 1) ResetKritikBar(lblKritikBar2, lblKritikBar2Qty, prgKritik2, ad, qty, pct, kritik);
+                        else ResetKritikBar(lblKritikBar3, lblKritikBar3Qty, prgKritik3, ad, qty, pct, kritik);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ErrorManager.LogMessage(string.Format("LoadKritikStokBars error: {0}", ex.Message), "DASHBOARD");
+            }
+        }
+
+        private void ResetKritikBar(
+            LabelControl nameLabel,
+            LabelControl qtyLabel,
+            ProgressBarControl bar,
+            string name,
+            string qty,
+            int percent,
+            bool kritik)
+        {
+            nameLabel.Text = name;
+            qtyLabel.Text = qty;
+            bar.Properties.Maximum = 100;
+            bar.EditValue = percent;
+            bar.Properties.StartColor = kritik ? ModernTheme.Colors.Terracotta : ModernTheme.Colors.Olive;
+            bar.Properties.EndColor = kritik ? ModernTheme.Colors.Terracotta : ModernTheme.Colors.Olive;
         }
 
         public override string SaveData()
