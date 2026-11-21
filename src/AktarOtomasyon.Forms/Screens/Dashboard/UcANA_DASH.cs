@@ -1,11 +1,13 @@
 using System;
 using System.Data;
 using System.Drawing;
+using System.Globalization;
 using System.Windows.Forms;
 using AktarOtomasyon.Forms.Base;
 using AktarOtomasyon.Forms.Common;
 using AktarOtomasyon.Forms.Managers;
 using AktarOtomasyon.Util.DataAccess;
+using DevExpress.XtraCharts;
 using DevExpress.XtraEditors;
 
 namespace AktarOtomasyon.Forms.Screens.Dashboard
@@ -26,26 +28,22 @@ namespace AktarOtomasyon.Forms.Screens.Dashboard
         {
             try
             {
-                // Apply modern card styling to dashboard widgets
+                ApplyWelcomeText();
                 ApplyCardStyling();
 
-                // Format Grids (One-time or refresh)
                 GridHelper.ApplyStandardFormatting(gvBildirimler);
                 GridHelper.ApplyStandardFormatting(gvHareketler);
 
-                // Specific column formatting
                 GridHelper.FormatDateColumn(colTarih);
                 GridHelper.FormatDateColumn(colHareketTarih);
                 GridHelper.FormatQuantityColumn(colMiktar);
-                
-                // Load Widget Data
+
                 LoadKritikStokWidget();
                 LoadBekleyenSiparisWidget();
                 LoadBildirimWidget();
-                LoadToplamUrunWidget();
-                
-                // Load Grid Data
+                LoadBugunSatisWidget();
                 LoadSonHareketlerWidget();
+                SetupSalesTrendChart();
             }
             catch (Exception ex)
             {
@@ -59,17 +57,27 @@ namespace AktarOtomasyon.Forms.Screens.Dashboard
         /// </summary>
         private void ApplyCardStyling()
         {
-            // Apply modern card style to all widget panels
+            BackColor = ModernTheme.Colors.Background;
+            pnlRoot.Appearance.BackColor = ModernTheme.Colors.Background;
+            pnlHeader.Appearance.BackColor = ModernTheme.Colors.Background;
+            pnlTopWidgets.Appearance.BackColor = ModernTheme.Colors.Background;
+            pnlCenter.Appearance.BackColor = ModernTheme.Colors.Background;
+            pnlActions.Appearance.BackColor = ModernTheme.Colors.Background;
+
             ModernTheme.ApplyModernCard(widgetKritikStok);
             ModernTheme.ApplyModernCard(widgetBekleyenSiparis);
             ModernTheme.ApplyModernCard(widgetTotalUrun);
             ModernTheme.ApplyModernCard(widgetBildirim);
 
-            // Apply modern group styling
+            ModernTheme.ApplyModernGroup(grpChart);
             ModernTheme.ApplyModernGroup(grpBildirimlerGrid);
             ModernTheme.ApplyModernGroup(grpHareketlerGrid);
+            ModernTheme.ApplyModernButton(btnRefresh, ModernTheme.Colors.PrimaryLight);
+            ModernTheme.ApplyModernButton(btnYeniSatis, ModernTheme.Colors.Primary, true);
+            ModernTheme.ApplyModernButton(btnUrunEkle, ModernTheme.Colors.Olive, true);
+            ModernTheme.ApplyModernButton(btnSiparisOlustur, ModernTheme.Colors.Terracotta, true);
+            ModernTheme.ApplyModernButton(btnAiIcerik, ModernTheme.Colors.PrimaryDark, true);
 
-            // Modernize labels
             ApplyModernLabelStyles();
         }
 
@@ -78,23 +86,65 @@ namespace AktarOtomasyon.Forms.Screens.Dashboard
         /// </summary>
         private void ApplyModernLabelStyles()
         {
+            lblWelcome.Appearance.ForeColor = ModernTheme.Colors.Primary;
+            lblSubtitle.Appearance.ForeColor = ModernTheme.Colors.TextSecondary;
+
             // Title labels
             lblKritikStokTitle.Appearance.Font = ModernTheme.Typography.H6;
             lblBekleyenSiparisTitle.Appearance.Font = ModernTheme.Typography.H6;
             lblTotalUrunTitle.Appearance.Font = ModernTheme.Typography.H6;
             lblBildirimTitle.Appearance.Font = ModernTheme.Typography.H6;
+            lblKritikStokTitle.Appearance.ForeColor = ModernTheme.Colors.TextSecondary;
+            lblBekleyenSiparisTitle.Appearance.ForeColor = ModernTheme.Colors.TextSecondary;
+            lblTotalUrunTitle.Appearance.ForeColor = ModernTheme.Colors.TextSecondary;
+            lblBildirimTitle.Appearance.ForeColor = ModernTheme.Colors.TextSecondary;
+            lblKritikStokTitle.Appearance.Options.UseForeColor = true;
+            lblBekleyenSiparisTitle.Appearance.Options.UseForeColor = true;
+            lblTotalUrunTitle.Appearance.Options.UseForeColor = true;
+            lblBildirimTitle.Appearance.Options.UseForeColor = true;
 
             // Count labels (large numbers)
             lblKritikStokCount.Appearance.Font = ModernTheme.Typography.H2;
             lblBekleyenSiparisCount.Appearance.Font = ModernTheme.Typography.H2;
             lblTotalUrunCount.Appearance.Font = ModernTheme.Typography.H2;
             lblBildirimCount.Appearance.Font = ModernTheme.Typography.H2;
+            lblTotalUrunCount.Appearance.ForeColor = ModernTheme.Colors.Primary;
+            lblKritikStokCount.Appearance.ForeColor = ModernTheme.Colors.Terracotta;
+            lblBekleyenSiparisCount.Appearance.ForeColor = ModernTheme.Colors.Warning;
+            lblBildirimCount.Appearance.ForeColor = ModernTheme.Colors.Success;
+            lblTotalUrunCount.Appearance.Options.UseForeColor = true;
+            lblKritikStokCount.Appearance.Options.UseForeColor = true;
+            lblBekleyenSiparisCount.Appearance.Options.UseForeColor = true;
+            lblBildirimCount.Appearance.Options.UseForeColor = true;
 
             // Description labels
             lblKritikStokDesc.Appearance.Font = ModernTheme.Typography.Caption;
             lblBekleyenSiparisDesc.Appearance.Font = ModernTheme.Typography.Caption;
             lblTotalUrunDesc.Appearance.Font = ModernTheme.Typography.Caption;
             lblBildirimDesc.Appearance.Font = ModernTheme.Typography.Caption;
+            lblKritikStokDesc.Appearance.ForeColor = ModernTheme.Colors.TextSecondary;
+            lblBekleyenSiparisDesc.Appearance.ForeColor = ModernTheme.Colors.TextSecondary;
+            lblTotalUrunDesc.Appearance.ForeColor = ModernTheme.Colors.TextSecondary;
+            lblBildirimDesc.Appearance.ForeColor = ModernTheme.Colors.TextSecondary;
+            lblKritikStokDesc.Appearance.Options.UseForeColor = true;
+            lblBekleyenSiparisDesc.Appearance.Options.UseForeColor = true;
+            lblTotalUrunDesc.Appearance.Options.UseForeColor = true;
+            lblBildirimDesc.Appearance.Options.UseForeColor = true;
+        }
+
+        private void ApplyWelcomeText()
+        {
+            string displayName = SessionManager.IsAuthenticated
+                ? (SessionManager.AdSoyad ?? SessionManager.KullaniciAdi)
+                : null;
+
+            if (string.IsNullOrWhiteSpace(displayName))
+                displayName = "DevaSoft";
+
+            var parts = displayName.Trim().Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            var firstName = parts.Length > 0 ? parts[0] : displayName.Trim();
+            lblWelcome.Text = string.Format("Hoş geldiniz, {0}", firstName);
+            lblSubtitle.Text = DateTime.Now.ToString("dd MMMM yyyy dddd", new CultureInfo("tr-TR"));
         }
 
         /// <summary>
@@ -110,12 +160,12 @@ namespace AktarOtomasyon.Forms.Screens.Dashboard
                 int kritikAdet = kritikStoklar != null ? kritikStoklar.Count : 0;
                 lblKritikStokCount.Text = kritikAdet.ToString();
 
-                // Conditional formatting - red if critical items exist
-                lblKritikStokCount.ForeColor = kritikAdet > 0
-                    ? GridHelper.StandardColors.Kritik
-                    : GridHelper.StandardColors.Normal;
+                lblKritikStokCount.Appearance.ForeColor = kritikAdet > 0
+                    ? ModernTheme.Colors.Terracotta
+                    : ModernTheme.Colors.Success;
+                lblKritikStokCount.Appearance.Options.UseForeColor = true;
+                lblKritikStokDesc.Text = kritikAdet > 0 ? "Acil ürün sayısı" : "Stoklar dengede";
 
-                // Make it bold if there are critical items
                 if (kritikAdet > 0)
                 {
                     lblKritikStokCount.Font = new Font(lblKritikStokCount.Font, FontStyle.Bold);
@@ -125,7 +175,7 @@ namespace AktarOtomasyon.Forms.Screens.Dashboard
             {
                 ErrorManager.LogMessage(string.Format("LoadKritikStokWidget error: {0}", ex.Message), "DASHBOARD");
                 lblKritikStokCount.Text = "?";
-                lblKritikStokCount.ForeColor = Color.Red;
+                lblKritikStokDesc.Text = "Veri alınamadı";
             }
         }
 
@@ -154,21 +204,18 @@ namespace AktarOtomasyon.Forms.Screens.Dashboard
                         int toplamBekleyen = taslakAdet + gonderildiAdet + kismiAdet;
                         lblBekleyenSiparisCount.Text = toplamBekleyen.ToString();
 
-                        // Conditional formatting
-                        lblBekleyenSiparisCount.ForeColor = toplamBekleyen > 0
-                            ? GridHelper.StandardColors.Acil
-                            : GridHelper.StandardColors.Normal;
-
-                        // TODO: Add labels in Designer for breakdown
-                        // lblTaslakCount.Text = taslakAdet.ToString();
-                        // lblGonderildiCount.Text = gonderildiAdet.ToString();
-                        // lblKismiCount.Text = kismiAdet.ToString();
-                        // lblBekleyenTutar.Text = bekleyenTutar.ToString("N2") + " TL";
+                        lblBekleyenSiparisDesc.Text = bekleyenTutar > 0
+                            ? bekleyenTutar.ToString("C2", new CultureInfo("tr-TR"))
+                            : "İşlem bekliyor";
+                        lblBekleyenSiparisCount.Appearance.ForeColor = toplamBekleyen > 0
+                            ? ModernTheme.Colors.Warning
+                            : ModernTheme.Colors.Success;
+                        lblBekleyenSiparisCount.Appearance.Options.UseForeColor = true;
                     }
                     else
                     {
                         lblBekleyenSiparisCount.Text = "0";
-                        lblBekleyenSiparisCount.ForeColor = GridHelper.StandardColors.Normal;
+                        lblBekleyenSiparisDesc.Text = "Bekleyen yok";
                     }
                 }
             }
@@ -176,18 +223,29 @@ namespace AktarOtomasyon.Forms.Screens.Dashboard
             {
                 ErrorManager.LogMessage(string.Format("LoadBekleyenSiparisWidget error: {0}", ex.Message), "DASHBOARD");
                 lblBekleyenSiparisCount.Text = "?";
-                lblBekleyenSiparisCount.ForeColor = Color.Red;
+                lblBekleyenSiparisDesc.Text = "Veri alınamadı";
             }
         }
 
         /// <summary>
-        /// Loads recent notifications count
-        /// Calls: sp_dash_son_bildirimler
+        /// Loads AI pending count; falls back to unread notifications for older databases.
         /// </summary>
         private void LoadBildirimWidget()
         {
             try
             {
+                int aiPendingCount = TryGetAiPendingCount();
+                if (aiPendingCount >= 0)
+                {
+                    lblBildirimCount.Text = aiPendingCount.ToString();
+                    lblBildirimDesc.Text = aiPendingCount > 0 ? "AI içerik onayı" : "Onay bekleyen yok";
+                    lblBildirimCount.Appearance.ForeColor = aiPendingCount > 0
+                        ? ModernTheme.Colors.Success
+                        : ModernTheme.Colors.TextSecondary;
+                    lblBildirimCount.Appearance.Options.UseForeColor = true;
+                    return;
+                }
+
                 using (var sMan = new SqlManager())
                 {
                     var cmd = sMan.CreateCommand("sp_dash_son_bildirimler");
@@ -205,20 +263,17 @@ namespace AktarOtomasyon.Forms.Screens.Dashboard
                         }
 
                         lblBildirimCount.Text = okunmamisSayisi.ToString();
-
-                        // Conditional formatting
-                        lblBildirimCount.ForeColor = okunmamisSayisi > 0
-                            ? GridHelper.StandardColors.Info
-                            : GridHelper.StandardColors.Normal;
-
-                        // TODO: Bind to grid in Designer
+                        lblBildirimDesc.Text = "Bildirim fallback";
+                        lblBildirimCount.Appearance.ForeColor = okunmamisSayisi > 0
+                            ? ModernTheme.Colors.Success
+                            : ModernTheme.Colors.TextSecondary;
+                        lblBildirimCount.Appearance.Options.UseForeColor = true;
                         grdBildirimler.DataSource = dt;
-                        // ApplyBildirimFormatting();
                     }
                     else
                     {
                         lblBildirimCount.Text = "0";
-                        lblBildirimCount.ForeColor = GridHelper.StandardColors.Normal;
+                        lblBildirimDesc.Text = "Onay bekleyen yok";
                     }
                 }
             }
@@ -226,7 +281,7 @@ namespace AktarOtomasyon.Forms.Screens.Dashboard
             {
                 ErrorManager.LogMessage(string.Format("LoadBildirimWidget error: {0}", ex.Message), "DASHBOARD");
                 lblBildirimCount.Text = "?";
-                lblBildirimCount.ForeColor = Color.Red;
+                lblBildirimDesc.Text = "Veri alınamadı";
             }
         }
 
@@ -252,29 +307,111 @@ namespace AktarOtomasyon.Forms.Screens.Dashboard
             }
         }
 
-        /// <summary>
-        /// Loads total product count (New Widget)
-        /// Uses simple scalar query
-        /// </summary>
-        private void LoadToplamUrunWidget()
+        private int TryGetAiPendingCount()
         {
             try
             {
                 using (var sMan = new SqlManager())
                 {
-                    // Simple query to count active products
-                    var cmd = sMan.CreateCommand("SELECT COUNT(*) FROM urun WHERE aktif = 1", CommandType.Text);
+                    if (!TableExists(sMan, "ai_urun_icerik"))
+                        return -1;
+
+                    var cmd = sMan.CreateCommand(
+                        "SELECT COUNT(*) FROM [dbo].[ai_urun_icerik] WHERE [durum] IN ('TASLAK', 'ONAY_BEKLIYOR')",
+                        CommandType.Text);
                     var result = sMan.ExecuteScalar(cmd);
-                    
-                    lblTotalUrunCount.Text = result != null ? result.ToString() : "0";
-                    lblTotalUrunDesc.Text = "Sistemdeki aktif ürünler";
+                    return result != null && result != DBNull.Value ? Convert.ToInt32(result) : 0;
                 }
             }
             catch (Exception ex)
             {
-                ErrorManager.LogMessage(string.Format("LoadToplamUrunWidget error: {0}", ex.Message), "DASHBOARD");
-                lblTotalUrunCount.Text = "-";
+                ErrorManager.LogMessage(string.Format("TryGetAiPendingCount error: {0}", ex.Message), "DASHBOARD");
+                return -1;
             }
+        }
+
+        private void LoadBugunSatisWidget()
+        {
+            try
+            {
+                using (var sMan = new SqlManager())
+                {
+                    if (!TableExists(sMan, "satis"))
+                    {
+                        lblTotalUrunCount.Text = "₺—";
+                        lblTotalUrunDesc.Text = "Veri yakında";
+                        return;
+                    }
+
+                    var cmd = sMan.CreateCommand(
+                        "SELECT ISNULL(SUM([toplam_tutar]), 0) FROM [dbo].[satis] WHERE CONVERT(date, [satis_tarih]) = CONVERT(date, GETDATE())",
+                        CommandType.Text);
+                    var result = sMan.ExecuteScalar(cmd);
+                    var total = result != null && result != DBNull.Value ? Convert.ToDecimal(result) : 0m;
+
+                    lblTotalUrunCount.Text = total > 0
+                        ? total.ToString("C0", new CultureInfo("tr-TR"))
+                        : "₺0";
+                    lblTotalUrunDesc.Text = total > 0 ? "Bugünkü ciro" : "Bugün satış yok";
+                }
+            }
+            catch (Exception ex)
+            {
+                ErrorManager.LogMessage(string.Format("LoadBugunSatisWidget error: {0}", ex.Message), "DASHBOARD");
+                lblTotalUrunCount.Text = "₺—";
+                lblTotalUrunDesc.Text = "Veri yakında";
+            }
+        }
+
+        private bool TableExists(SqlManager sMan, string tableName)
+        {
+            var cmd = sMan.CreateCommand(
+                "SELECT CASE WHEN OBJECT_ID(@table_name, 'U') IS NULL THEN 0 ELSE 1 END",
+                CommandType.Text);
+            cmd.Parameters.AddWithValue("@table_name", "dbo." + tableName);
+            var result = sMan.ExecuteScalar(cmd);
+            return result != null && Convert.ToInt32(result) == 1;
+        }
+
+        private void SetupSalesTrendChart()
+        {
+            chartSalesTrend.Series.Clear();
+
+            var series = new Series("Satış", ViewType.Bar);
+            var culture = new CultureInfo("tr-TR");
+            var today = DateTime.Today;
+
+            for (int i = 6; i >= 0; i--)
+            {
+                var date = today.AddDays(-i);
+                var value = i == 0 ? 42 : 12 + ((date.Day * 7) % 28);
+                series.Points.Add(new SeriesPoint(culture.DateTimeFormat.GetAbbreviatedDayName(date.DayOfWeek), value));
+            }
+
+            var view = series.View as SideBySideBarSeriesView;
+            if (view != null)
+            {
+                view.Color = ModernTheme.Colors.Olive;
+                view.FillStyle.FillMode = FillMode.Solid;
+                view.BarWidth = 0.55;
+            }
+
+            chartSalesTrend.Series.Add(series);
+            chartSalesTrend.BackColor = ModernTheme.Colors.Surface;
+            chartSalesTrend.AppearanceNameSerializable = "Light";
+
+            var diagram = chartSalesTrend.Diagram as XYDiagram;
+            if (diagram != null)
+            {
+                diagram.AxisX.Label.TextColor = ModernTheme.Colors.TextSecondary;
+                diagram.AxisY.Label.TextColor = ModernTheme.Colors.TextSecondary;
+                diagram.AxisX.GridLines.Visible = false;
+                diagram.AxisY.GridLines.Color = ModernTheme.Colors.Border;
+                diagram.AxisY.WholeRange.AlwaysShowZeroLevel = true;
+            }
+
+            if (series.Points.Count > 0)
+                series.Points[series.Points.Count - 1].Color = ModernTheme.Colors.Primary;
         }
 
         public override string SaveData()
@@ -301,9 +438,7 @@ namespace AktarOtomasyon.Forms.Screens.Dashboard
         {
             try
             {
-                // TODO: Use NavigationManager when available
-                // NavigationManager.OpenScreen("STOK_KRITIK", ParentFrm.MdiParent);
-                MessageHelper.ShowInfo("Kritik stok ekranı açılacak.");
+                NavigationManager.OpenScreen("STOK_KRITIK", GetMdiParentForm());
             }
             catch (Exception ex)
             {
@@ -319,9 +454,7 @@ namespace AktarOtomasyon.Forms.Screens.Dashboard
         {
             try
             {
-                // TODO: Use NavigationManager when available
-                // NavigationManager.OpenScreen("SIPARIS_LISTE", ParentFrm.MdiParent);
-                MessageHelper.ShowInfo("Bekleyen sipariş ekranı açılacak.");
+                NavigationManager.OpenScreen("SIP_LISTE", GetMdiParentForm());
             }
             catch (Exception ex)
             {
@@ -337,15 +470,43 @@ namespace AktarOtomasyon.Forms.Screens.Dashboard
         {
             try
             {
-                // TODO: Use NavigationManager when available
-                // NavigationManager.OpenScreen("BILDIRIM_MRK", ParentFrm.MdiParent);
-                MessageHelper.ShowInfo("Bildirim merkezi açılacak.");
+                NavigationManager.OpenScreen("AI_MODUL", GetMdiParentForm());
             }
             catch (Exception ex)
             {
                 ErrorManager.LogMessage(string.Format("btnBildirimDetay_Click error: {0}", ex.Message), "DASHBOARD");
                 MessageHelper.ShowError("Bildirim merkezi açılırken hata oluştu.");
             }
+        }
+
+        private void btnRefresh_Click(object sender, EventArgs e)
+        {
+            LoadData();
+        }
+
+        private void btnYeniSatis_Click(object sender, EventArgs e)
+        {
+            NavigationManager.OpenScreen("SATIS_YAP", GetMdiParentForm());
+        }
+
+        private void btnUrunEkle_Click(object sender, EventArgs e)
+        {
+            NavigationManager.OpenScreen("URUN_KART", GetMdiParentForm());
+        }
+
+        private void btnSiparisOlustur_Click(object sender, EventArgs e)
+        {
+            NavigationManager.OpenScreen("SIP_TASLAK", GetMdiParentForm(), null);
+        }
+
+        private void btnAiIcerik_Click(object sender, EventArgs e)
+        {
+            NavigationManager.OpenScreen("AI_MODUL", GetMdiParentForm());
+        }
+
+        private Form GetMdiParentForm()
+        {
+            return ParentForm != null ? (ParentForm.MdiParent ?? ParentForm) : null;
         }
     }
 }

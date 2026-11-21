@@ -74,6 +74,12 @@
     <Reference Include="DevExpress.XtraCharts.v25.1">
       <HintPath>C:\Program Files\DevExpress 25.1\Components\Bin\Framework\DevExpress.XtraCharts.v25.1.dll</HintPath>
     </Reference>
+    <Reference Include="DevExpress.XtraCharts.v25.1.UI">
+      <HintPath>C:\Program Files\DevExpress 25.1\Components\Bin\Framework\DevExpress.XtraCharts.v25.1.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="DevExpress.Charts.v25.1.Core">
+      <HintPath>C:\Program Files\DevExpress 25.1\Components\Bin\Framework\DevExpress.Charts.v25.1.Core.dll</HintPath>
+    </Reference>
     <Reference Include="DevExpress.XtraReports.v25.1">
       <HintPath>C:\Program Files\DevExpress 25.1\Components\Bin\Framework\DevExpress.XtraReports.v25.1.dll</HintPath>
     </Reference>

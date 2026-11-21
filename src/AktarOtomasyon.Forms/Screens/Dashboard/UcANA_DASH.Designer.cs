@@ -17,6 +17,12 @@ namespace AktarOtomasyon.Forms.Screens.Dashboard
 
         private void InitializeComponent()
         {
+            DevExpress.XtraCharts.XYDiagram xyDiagram1 = new DevExpress.XtraCharts.XYDiagram();
+            this.pnlRoot = new DevExpress.XtraEditors.PanelControl();
+            this.pnlHeader = new DevExpress.XtraEditors.PanelControl();
+            this.btnRefresh = new DevExpress.XtraEditors.SimpleButton();
+            this.lblSubtitle = new DevExpress.XtraEditors.LabelControl();
+            this.lblWelcome = new DevExpress.XtraEditors.LabelControl();
             this.pnlTopWidgets = new DevExpress.XtraEditors.PanelControl();
             this.tablePanelWidgets = new DevExpress.Utils.Layout.TablePanel();
             this.widgetBildirim = new DevExpress.XtraEditors.PanelControl();
@@ -37,6 +43,8 @@ namespace AktarOtomasyon.Forms.Screens.Dashboard
             this.lblKritikStokTitle = new DevExpress.XtraEditors.LabelControl();
             this.pnlCenter = new DevExpress.XtraEditors.PanelControl();
             this.splitContainerControl1 = new DevExpress.XtraEditors.SplitContainerControl();
+            this.grpChart = new DevExpress.XtraEditors.GroupControl();
+            this.chartSalesTrend = new DevExpress.XtraCharts.ChartControl();
             this.grpBildirimlerGrid = new DevExpress.XtraEditors.GroupControl();
             this.grdBildirimler = new DevExpress.XtraGrid.GridControl();
             this.gvBildirimler = new DevExpress.XtraGrid.Views.Grid.GridView();
@@ -51,6 +59,16 @@ namespace AktarOtomasyon.Forms.Screens.Dashboard
             this.colHareketTip = new DevExpress.XtraGrid.Columns.GridColumn();
             this.colMiktar = new DevExpress.XtraGrid.Columns.GridColumn();
             this.colHareketTarih = new DevExpress.XtraGrid.Columns.GridColumn();
+            this.pnlActions = new DevExpress.XtraEditors.PanelControl();
+            this.tablePanelActions = new DevExpress.Utils.Layout.TablePanel();
+            this.btnAiIcerik = new DevExpress.XtraEditors.SimpleButton();
+            this.btnSiparisOlustur = new DevExpress.XtraEditors.SimpleButton();
+            this.btnUrunEkle = new DevExpress.XtraEditors.SimpleButton();
+            this.btnYeniSatis = new DevExpress.XtraEditors.SimpleButton();
+            ((System.ComponentModel.ISupportInitialize)(this.pnlRoot)).BeginInit();
+            this.pnlRoot.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pnlHeader)).BeginInit();
+            this.pnlHeader.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pnlTopWidgets)).BeginInit();
             this.pnlTopWidgets.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.tablePanelWidgets)).BeginInit();
@@ -67,6 +85,10 @@ namespace AktarOtomasyon.Forms.Screens.Dashboard
             this.pnlCenter.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerControl1)).BeginInit();
             this.splitContainerControl1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.grpChart)).BeginInit();
+            this.grpChart.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.chartSalesTrend)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(xyDiagram1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.grpBildirimlerGrid)).BeginInit();
             this.grpBildirimlerGrid.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.grdBildirimler)).BeginInit();
@@ -79,17 +101,85 @@ namespace AktarOtomasyon.Forms.Screens.Dashboard
             this.grdHareketler.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gvHareketler});
             ((System.ComponentModel.ISupportInitialize)(this.gvHareketler)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pnlActions)).BeginInit();
+            this.pnlActions.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.tablePanelActions)).BeginInit();
+            this.tablePanelActions.SuspendLayout();
             this.SuspendLayout();
+            // 
+            // pnlRoot
+            // 
+            this.pnlRoot.Appearance.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(247)))), ((int)(((byte)(242)))));
+            this.pnlRoot.Appearance.Options.UseBackColor = true;
+            this.pnlRoot.BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.NoBorder;
+            this.pnlRoot.Controls.Add(this.pnlCenter);
+            this.pnlRoot.Controls.Add(this.pnlActions);
+            this.pnlRoot.Controls.Add(this.pnlTopWidgets);
+            this.pnlRoot.Controls.Add(this.pnlHeader);
+            this.pnlRoot.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pnlRoot.Location = new System.Drawing.Point(0, 0);
+            this.pnlRoot.Name = "pnlRoot";
+            this.pnlRoot.Size = new System.Drawing.Size(1100, 760);
+            this.pnlRoot.TabIndex = 0;
+            // 
+            // pnlHeader
+            // 
+            this.pnlHeader.Appearance.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(247)))), ((int)(((byte)(242)))));
+            this.pnlHeader.Appearance.Options.UseBackColor = true;
+            this.pnlHeader.BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.NoBorder;
+            this.pnlHeader.Controls.Add(this.btnRefresh);
+            this.pnlHeader.Controls.Add(this.lblSubtitle);
+            this.pnlHeader.Controls.Add(this.lblWelcome);
+            this.pnlHeader.Dock = System.Windows.Forms.DockStyle.Top;
+            this.pnlHeader.Location = new System.Drawing.Point(0, 0);
+            this.pnlHeader.Name = "pnlHeader";
+            this.pnlHeader.Padding = new System.Windows.Forms.Padding(24, 14, 24, 8);
+            this.pnlHeader.Size = new System.Drawing.Size(1100, 70);
+            this.pnlHeader.TabIndex = 3;
+            // 
+            // btnRefresh
+            // 
+            this.btnRefresh.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnRefresh.Location = new System.Drawing.Point(980, 18);
+            this.btnRefresh.Name = "btnRefresh";
+            this.btnRefresh.Size = new System.Drawing.Size(96, 36);
+            this.btnRefresh.TabIndex = 2;
+            this.btnRefresh.Text = "Yenile";
+            this.btnRefresh.Click += new System.EventHandler(this.btnRefresh_Click);
+            // 
+            // lblSubtitle
+            // 
+            this.lblSubtitle.Appearance.Font = new System.Drawing.Font("Segoe UI", 10F);
+            this.lblSubtitle.Appearance.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(71)))), ((int)(((byte)(82)))), ((int)(((byte)(76)))));
+            this.lblSubtitle.Appearance.Options.UseFont = true;
+            this.lblSubtitle.Appearance.Options.UseForeColor = true;
+            this.lblSubtitle.Location = new System.Drawing.Point(26, 43);
+            this.lblSubtitle.Name = "lblSubtitle";
+            this.lblSubtitle.Size = new System.Drawing.Size(128, 17);
+            this.lblSubtitle.TabIndex = 1;
+            this.lblSubtitle.Text = "21 Kasım 2026 Cumartesi";
+            // 
+            // lblWelcome
+            // 
+            this.lblWelcome.Appearance.Font = new System.Drawing.Font("Segoe UI", 18F, System.Drawing.FontStyle.Bold);
+            this.lblWelcome.Appearance.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(58)))), ((int)(((byte)(47)))));
+            this.lblWelcome.Appearance.Options.UseFont = true;
+            this.lblWelcome.Appearance.Options.UseForeColor = true;
+            this.lblWelcome.Location = new System.Drawing.Point(24, 10);
+            this.lblWelcome.Name = "lblWelcome";
+            this.lblWelcome.Size = new System.Drawing.Size(179, 32);
+            this.lblWelcome.TabIndex = 0;
+            this.lblWelcome.Text = "Hoş geldiniz, -";
             // 
             // pnlTopWidgets
             // 
             this.pnlTopWidgets.BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.NoBorder;
             this.pnlTopWidgets.Controls.Add(this.tablePanelWidgets);
             this.pnlTopWidgets.Dock = System.Windows.Forms.DockStyle.Top;
-            this.pnlTopWidgets.Location = new System.Drawing.Point(0, 0);
+            this.pnlTopWidgets.Location = new System.Drawing.Point(0, 70);
             this.pnlTopWidgets.Name = "pnlTopWidgets";
-            this.pnlTopWidgets.Padding = new System.Windows.Forms.Padding(10);
-            this.pnlTopWidgets.Size = new System.Drawing.Size(1000, 160);
+            this.pnlTopWidgets.Padding = new System.Windows.Forms.Padding(14, 4, 14, 10);
+            this.pnlTopWidgets.Size = new System.Drawing.Size(1100, 150);
             this.pnlTopWidgets.TabIndex = 0;
             // 
             // tablePanelWidgets
@@ -104,11 +194,11 @@ namespace AktarOtomasyon.Forms.Screens.Dashboard
             this.tablePanelWidgets.Controls.Add(this.widgetBekleyenSiparis);
             this.tablePanelWidgets.Controls.Add(this.widgetKritikStok);
             this.tablePanelWidgets.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tablePanelWidgets.Location = new System.Drawing.Point(10, 10);
+            this.tablePanelWidgets.Location = new System.Drawing.Point(14, 4);
             this.tablePanelWidgets.Name = "tablePanelWidgets";
             this.tablePanelWidgets.Rows.AddRange(new DevExpress.Utils.Layout.TablePanelRow[] {
             new DevExpress.Utils.Layout.TablePanelRow(DevExpress.Utils.Layout.TablePanelEntityStyle.Absolute, 140F)});
-            this.tablePanelWidgets.Size = new System.Drawing.Size(980, 140);
+            this.tablePanelWidgets.Size = new System.Drawing.Size(1072, 136);
             this.tablePanelWidgets.TabIndex = 0;
             // 
             // widgetBildirim
@@ -125,7 +215,7 @@ namespace AktarOtomasyon.Forms.Screens.Dashboard
             this.widgetBildirim.Margin = new System.Windows.Forms.Padding(10);
             this.widgetBildirim.Name = "widgetBildirim";
             this.tablePanelWidgets.SetRow(this.widgetBildirim, 0);
-            this.widgetBildirim.Size = new System.Drawing.Size(225, 120);
+            this.widgetBildirim.Size = new System.Drawing.Size(248, 116);
             this.widgetBildirim.TabIndex = 3;
             // 
             // lblBildirimDesc
@@ -138,7 +228,7 @@ namespace AktarOtomasyon.Forms.Screens.Dashboard
             this.lblBildirimDesc.Name = "lblBildirimDesc";
             this.lblBildirimDesc.Size = new System.Drawing.Size(99, 15);
             this.lblBildirimDesc.TabIndex = 2;
-            this.lblBildirimDesc.Text = "Okunmamış Mesaj";
+            this.lblBildirimDesc.Text = "İnceleme bekliyor";
             // 
             // lblBildirimCount
             // 
@@ -160,25 +250,25 @@ namespace AktarOtomasyon.Forms.Screens.Dashboard
             this.lblBildirimTitle.Appearance.Options.UseForeColor = true;
             this.lblBildirimTitle.Location = new System.Drawing.Point(20, 15);
             this.lblBildirimTitle.Name = "lblBildirimTitle";
-            this.lblBildirimTitle.Size = new System.Drawing.Size(73, 17);
+            this.lblBildirimTitle.Size = new System.Drawing.Size(111, 17);
             this.lblBildirimTitle.TabIndex = 0;
-            this.lblBildirimTitle.Text = "BİLDİRİMLER";
+            this.lblBildirimTitle.Text = "AI ONAY BEKLEYEN";
             // 
             // widgetTotalUrun
             // 
             this.widgetTotalUrun.Appearance.BackColor = System.Drawing.Color.White;
             this.widgetTotalUrun.Appearance.Options.UseBackColor = true;
             this.widgetTotalUrun.BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.Simple;
-            this.tablePanelWidgets.SetColumn(this.widgetTotalUrun, 2);
+            this.tablePanelWidgets.SetColumn(this.widgetTotalUrun, 0);
             this.widgetTotalUrun.Controls.Add(this.lblTotalUrunDesc);
             this.widgetTotalUrun.Controls.Add(this.lblTotalUrunCount);
             this.widgetTotalUrun.Controls.Add(this.lblTotalUrunTitle);
             this.widgetTotalUrun.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.widgetTotalUrun.Location = new System.Drawing.Point(500, 10);
+            this.widgetTotalUrun.Location = new System.Drawing.Point(10, 10);
             this.widgetTotalUrun.Margin = new System.Windows.Forms.Padding(10);
             this.widgetTotalUrun.Name = "widgetTotalUrun";
             this.tablePanelWidgets.SetRow(this.widgetTotalUrun, 0);
-            this.widgetTotalUrun.Size = new System.Drawing.Size(225, 120);
+            this.widgetTotalUrun.Size = new System.Drawing.Size(248, 116);
             this.widgetTotalUrun.TabIndex = 2;
             // 
             // lblTotalUrunDesc
@@ -191,7 +281,7 @@ namespace AktarOtomasyon.Forms.Screens.Dashboard
             this.lblTotalUrunDesc.Name = "lblTotalUrunDesc";
             this.lblTotalUrunDesc.Size = new System.Drawing.Size(95, 15);
             this.lblTotalUrunDesc.TabIndex = 2;
-            this.lblTotalUrunDesc.Text = "Sistemdeki Ürünler";
+            this.lblTotalUrunDesc.Text = "Veri yakında";
             // 
             // lblTotalUrunCount
             // 
@@ -215,23 +305,23 @@ namespace AktarOtomasyon.Forms.Screens.Dashboard
             this.lblTotalUrunTitle.Name = "lblTotalUrunTitle";
             this.lblTotalUrunTitle.Size = new System.Drawing.Size(92, 17);
             this.lblTotalUrunTitle.TabIndex = 0;
-            this.lblTotalUrunTitle.Text = "TOPLAM ÜRÜN";
+            this.lblTotalUrunTitle.Text = "BUGÜNKÜ SATIŞ";
             // 
             // widgetBekleyenSiparis
             // 
             this.widgetBekleyenSiparis.Appearance.BackColor = System.Drawing.Color.White;
             this.widgetBekleyenSiparis.Appearance.Options.UseBackColor = true;
             this.widgetBekleyenSiparis.BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.Simple;
-            this.tablePanelWidgets.SetColumn(this.widgetBekleyenSiparis, 1);
+            this.tablePanelWidgets.SetColumn(this.widgetBekleyenSiparis, 2);
             this.widgetBekleyenSiparis.Controls.Add(this.lblBekleyenSiparisDesc);
             this.widgetBekleyenSiparis.Controls.Add(this.lblBekleyenSiparisCount);
             this.widgetBekleyenSiparis.Controls.Add(this.lblBekleyenSiparisTitle);
             this.widgetBekleyenSiparis.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.widgetBekleyenSiparis.Location = new System.Drawing.Point(255, 10);
+            this.widgetBekleyenSiparis.Location = new System.Drawing.Point(546, 10);
             this.widgetBekleyenSiparis.Margin = new System.Windows.Forms.Padding(10);
             this.widgetBekleyenSiparis.Name = "widgetBekleyenSiparis";
             this.tablePanelWidgets.SetRow(this.widgetBekleyenSiparis, 0);
-            this.widgetBekleyenSiparis.Size = new System.Drawing.Size(225, 120);
+            this.widgetBekleyenSiparis.Size = new System.Drawing.Size(248, 116);
             this.widgetBekleyenSiparis.TabIndex = 1;
             // 
             // lblBekleyenSiparisDesc
@@ -266,25 +356,25 @@ namespace AktarOtomasyon.Forms.Screens.Dashboard
             this.lblBekleyenSiparisTitle.Appearance.Options.UseForeColor = true;
             this.lblBekleyenSiparisTitle.Location = new System.Drawing.Point(20, 15);
             this.lblBekleyenSiparisTitle.Name = "lblBekleyenSiparisTitle";
-            this.lblBekleyenSiparisTitle.Size = new System.Drawing.Size(126, 17);
+            this.lblBekleyenSiparisTitle.Size = new System.Drawing.Size(107, 17);
             this.lblBekleyenSiparisTitle.TabIndex = 0;
-            this.lblBekleyenSiparisTitle.Text = "BEKLEYEN SİPARİŞLER";
+            this.lblBekleyenSiparisTitle.Text = "BEKLEYEN SİPARİŞ";
             // 
             // widgetKritikStok
             // 
             this.widgetKritikStok.Appearance.BackColor = System.Drawing.Color.White;
             this.widgetKritikStok.Appearance.Options.UseBackColor = true;
             this.widgetKritikStok.BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.Simple;
-            this.tablePanelWidgets.SetColumn(this.widgetKritikStok, 0);
+            this.tablePanelWidgets.SetColumn(this.widgetKritikStok, 1);
             this.widgetKritikStok.Controls.Add(this.lblKritikStokDesc);
             this.widgetKritikStok.Controls.Add(this.lblKritikStokCount);
             this.widgetKritikStok.Controls.Add(this.lblKritikStokTitle);
             this.widgetKritikStok.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.widgetKritikStok.Location = new System.Drawing.Point(10, 10);
+            this.widgetKritikStok.Location = new System.Drawing.Point(278, 10);
             this.widgetKritikStok.Margin = new System.Windows.Forms.Padding(10);
             this.widgetKritikStok.Name = "widgetKritikStok";
             this.tablePanelWidgets.SetRow(this.widgetKritikStok, 0);
-            this.widgetKritikStok.Size = new System.Drawing.Size(225, 120);
+            this.widgetKritikStok.Size = new System.Drawing.Size(248, 116);
             this.widgetKritikStok.TabIndex = 0;
             // 
             // lblKritikStokDesc
@@ -325,40 +415,69 @@ namespace AktarOtomasyon.Forms.Screens.Dashboard
             // 
             // pnlCenter
             // 
+            this.pnlCenter.Appearance.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(247)))), ((int)(((byte)(242)))));
+            this.pnlCenter.Appearance.Options.UseBackColor = true;
             this.pnlCenter.BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.NoBorder;
             this.pnlCenter.Controls.Add(this.splitContainerControl1);
             this.pnlCenter.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pnlCenter.Location = new System.Drawing.Point(0, 160);
+            this.pnlCenter.Location = new System.Drawing.Point(0, 220);
             this.pnlCenter.Name = "pnlCenter";
-            this.pnlCenter.Padding = new System.Windows.Forms.Padding(10, 0, 10, 10);
-            this.pnlCenter.Size = new System.Drawing.Size(1000, 540);
+            this.pnlCenter.Padding = new System.Windows.Forms.Padding(14, 0, 14, 10);
+            this.pnlCenter.Size = new System.Drawing.Size(1100, 470);
             this.pnlCenter.TabIndex = 1;
             // 
             // splitContainerControl1
             // 
             this.splitContainerControl1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.splitContainerControl1.Location = new System.Drawing.Point(10, 0);
+            this.splitContainerControl1.Location = new System.Drawing.Point(14, 0);
             this.splitContainerControl1.Name = "splitContainerControl1";
-            this.splitContainerControl1.Panel1.Controls.Add(this.grpBildirimlerGrid);
+            this.splitContainerControl1.Panel1.Controls.Add(this.grpChart);
             this.splitContainerControl1.Panel1.Text = "Panel1";
             this.splitContainerControl1.Panel2.Controls.Add(this.grpHareketlerGrid);
             this.splitContainerControl1.Panel2.Text = "Panel2";
-            this.splitContainerControl1.Size = new System.Drawing.Size(980, 530);
-            this.splitContainerControl1.SplitterPosition = 480;
+            this.splitContainerControl1.Size = new System.Drawing.Size(1072, 460);
+            this.splitContainerControl1.SplitterPosition = 570;
             this.splitContainerControl1.TabIndex = 0;
             this.splitContainerControl1.Text = "splitContainerControl1";
+            // 
+            // grpChart
+            // 
+            this.grpChart.Appearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(217)))), ((int)(((byte)(212)))), ((int)(((byte)(202)))));
+            this.grpChart.Appearance.Options.UseBorderColor = true;
+            this.grpChart.Controls.Add(this.chartSalesTrend);
+            this.grpChart.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.grpChart.Location = new System.Drawing.Point(0, 0);
+            this.grpChart.Name = "grpChart";
+            this.grpChart.Size = new System.Drawing.Size(570, 460);
+            this.grpChart.TabIndex = 1;
+            this.grpChart.Text = "Satış Trendi ve Stok Durumu";
+            // 
+            // chartSalesTrend
+            // 
+            this.chartSalesTrend.BorderOptions.Visibility = DevExpress.Utils.DefaultBoolean.False;
+            xyDiagram1.AxisX.Label.TextPattern = "{A}";
+            xyDiagram1.AxisX.VisibleInPanesSerializable = "-1";
+            xyDiagram1.AxisY.VisibleInPanesSerializable = "-1";
+            this.chartSalesTrend.Diagram = xyDiagram1;
+            this.chartSalesTrend.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.chartSalesTrend.Legend.Visibility = DevExpress.Utils.DefaultBoolean.False;
+            this.chartSalesTrend.Location = new System.Drawing.Point(2, 23);
+            this.chartSalesTrend.Name = "chartSalesTrend";
+            this.chartSalesTrend.Size = new System.Drawing.Size(566, 435);
+            this.chartSalesTrend.TabIndex = 0;
             // 
             // grpBildirimlerGrid
             // 
             this.grpBildirimlerGrid.Appearance.BorderColor = System.Drawing.Color.White;
             this.grpBildirimlerGrid.Appearance.Options.UseBorderColor = true;
             this.grpBildirimlerGrid.Controls.Add(this.grdBildirimler);
-            this.grpBildirimlerGrid.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.grpBildirimlerGrid.Dock = System.Windows.Forms.DockStyle.None;
             this.grpBildirimlerGrid.Location = new System.Drawing.Point(0, 0);
             this.grpBildirimlerGrid.Name = "grpBildirimlerGrid";
-            this.grpBildirimlerGrid.Size = new System.Drawing.Size(480, 530);
+            this.grpBildirimlerGrid.Size = new System.Drawing.Size(10, 10);
             this.grpBildirimlerGrid.TabIndex = 0;
             this.grpBildirimlerGrid.Text = "Son Bildirimler";
+            this.grpBildirimlerGrid.Visible = false;
             // 
             // grdBildirimler
             // 
@@ -426,9 +545,9 @@ namespace AktarOtomasyon.Forms.Screens.Dashboard
             this.grpHareketlerGrid.Dock = System.Windows.Forms.DockStyle.Fill;
             this.grpHareketlerGrid.Location = new System.Drawing.Point(0, 0);
             this.grpHareketlerGrid.Name = "grpHareketlerGrid";
-            this.grpHareketlerGrid.Size = new System.Drawing.Size(490, 530);
+            this.grpHareketlerGrid.Size = new System.Drawing.Size(492, 460);
             this.grpHareketlerGrid.TabIndex = 0;
-            this.grpHareketlerGrid.Text = "Son Stok Hareketleri";
+            this.grpHareketlerGrid.Text = "Son Hareketler";
             // 
             // grdHareketler
             // 
@@ -436,7 +555,7 @@ namespace AktarOtomasyon.Forms.Screens.Dashboard
             this.grdHareketler.Location = new System.Drawing.Point(2, 23);
             this.grdHareketler.MainView = this.gvHareketler;
             this.grdHareketler.Name = "grdHareketler";
-            this.grdHareketler.Size = new System.Drawing.Size(486, 505);
+            this.grdHareketler.Size = new System.Drawing.Size(488, 435);
             this.grdHareketler.TabIndex = 0;
             this.grdHareketler.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gvHareketler});
@@ -489,14 +608,103 @@ namespace AktarOtomasyon.Forms.Screens.Dashboard
             this.colHareketTarih.VisibleIndex = 3;
             this.colHareketTarih.Width = 120;
             // 
+            // pnlActions
+            // 
+            this.pnlActions.Appearance.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(247)))), ((int)(((byte)(242)))));
+            this.pnlActions.Appearance.Options.UseBackColor = true;
+            this.pnlActions.BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.NoBorder;
+            this.pnlActions.Controls.Add(this.tablePanelActions);
+            this.pnlActions.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.pnlActions.Location = new System.Drawing.Point(0, 690);
+            this.pnlActions.Name = "pnlActions";
+            this.pnlActions.Padding = new System.Windows.Forms.Padding(14, 8, 14, 14);
+            this.pnlActions.Size = new System.Drawing.Size(1100, 70);
+            this.pnlActions.TabIndex = 2;
+            // 
+            // tablePanelActions
+            // 
+            this.tablePanelActions.Columns.AddRange(new DevExpress.Utils.Layout.TablePanelColumn[] {
+            new DevExpress.Utils.Layout.TablePanelColumn(DevExpress.Utils.Layout.TablePanelEntityStyle.Relative, 25F),
+            new DevExpress.Utils.Layout.TablePanelColumn(DevExpress.Utils.Layout.TablePanelEntityStyle.Relative, 25F),
+            new DevExpress.Utils.Layout.TablePanelColumn(DevExpress.Utils.Layout.TablePanelEntityStyle.Relative, 25F),
+            new DevExpress.Utils.Layout.TablePanelColumn(DevExpress.Utils.Layout.TablePanelEntityStyle.Relative, 25F)});
+            this.tablePanelActions.Controls.Add(this.btnAiIcerik);
+            this.tablePanelActions.Controls.Add(this.btnSiparisOlustur);
+            this.tablePanelActions.Controls.Add(this.btnUrunEkle);
+            this.tablePanelActions.Controls.Add(this.btnYeniSatis);
+            this.tablePanelActions.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tablePanelActions.Location = new System.Drawing.Point(14, 8);
+            this.tablePanelActions.Name = "tablePanelActions";
+            this.tablePanelActions.Rows.AddRange(new DevExpress.Utils.Layout.TablePanelRow[] {
+            new DevExpress.Utils.Layout.TablePanelRow(DevExpress.Utils.Layout.TablePanelEntityStyle.Relative, 100F)});
+            this.tablePanelActions.Size = new System.Drawing.Size(1072, 48);
+            this.tablePanelActions.TabIndex = 0;
+            // 
+            // btnAiIcerik
+            // 
+            this.tablePanelActions.SetColumn(this.btnAiIcerik, 3);
+            this.btnAiIcerik.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.btnAiIcerik.Location = new System.Drawing.Point(813, 4);
+            this.btnAiIcerik.Margin = new System.Windows.Forms.Padding(9, 4, 9, 4);
+            this.btnAiIcerik.Name = "btnAiIcerik";
+            this.tablePanelActions.SetRow(this.btnAiIcerik, 0);
+            this.btnAiIcerik.Size = new System.Drawing.Size(250, 40);
+            this.btnAiIcerik.TabIndex = 3;
+            this.btnAiIcerik.Text = "AI İçerik Üret (F5)";
+            this.btnAiIcerik.Click += new System.EventHandler(this.btnAiIcerik_Click);
+            // 
+            // btnSiparisOlustur
+            // 
+            this.tablePanelActions.SetColumn(this.btnSiparisOlustur, 2);
+            this.btnSiparisOlustur.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.btnSiparisOlustur.Location = new System.Drawing.Point(545, 4);
+            this.btnSiparisOlustur.Margin = new System.Windows.Forms.Padding(9, 4, 9, 4);
+            this.btnSiparisOlustur.Name = "btnSiparisOlustur";
+            this.tablePanelActions.SetRow(this.btnSiparisOlustur, 0);
+            this.btnSiparisOlustur.Size = new System.Drawing.Size(250, 40);
+            this.btnSiparisOlustur.TabIndex = 2;
+            this.btnSiparisOlustur.Text = "Sipariş Oluştur (F4)";
+            this.btnSiparisOlustur.Click += new System.EventHandler(this.btnSiparisOlustur_Click);
+            // 
+            // btnUrunEkle
+            // 
+            this.tablePanelActions.SetColumn(this.btnUrunEkle, 1);
+            this.btnUrunEkle.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.btnUrunEkle.Location = new System.Drawing.Point(277, 4);
+            this.btnUrunEkle.Margin = new System.Windows.Forms.Padding(9, 4, 9, 4);
+            this.btnUrunEkle.Name = "btnUrunEkle";
+            this.tablePanelActions.SetRow(this.btnUrunEkle, 0);
+            this.btnUrunEkle.Size = new System.Drawing.Size(250, 40);
+            this.btnUrunEkle.TabIndex = 1;
+            this.btnUrunEkle.Text = "Ürün Ekle (F3)";
+            this.btnUrunEkle.Click += new System.EventHandler(this.btnUrunEkle_Click);
+            // 
+            // btnYeniSatis
+            // 
+            this.tablePanelActions.SetColumn(this.btnYeniSatis, 0);
+            this.btnYeniSatis.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.btnYeniSatis.Location = new System.Drawing.Point(9, 4);
+            this.btnYeniSatis.Margin = new System.Windows.Forms.Padding(9, 4, 9, 4);
+            this.btnYeniSatis.Name = "btnYeniSatis";
+            this.tablePanelActions.SetRow(this.btnYeniSatis, 0);
+            this.btnYeniSatis.Size = new System.Drawing.Size(250, 40);
+            this.btnYeniSatis.TabIndex = 0;
+            this.btnYeniSatis.Text = "Yeni Satış (F2)";
+            this.btnYeniSatis.Click += new System.EventHandler(this.btnYeniSatis_Click);
+            // 
             // UcANA_DASH
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(this.pnlCenter);
-            this.Controls.Add(this.pnlTopWidgets);
+            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(247)))), ((int)(((byte)(242)))));
+            this.Controls.Add(this.pnlRoot);
             this.Name = "UcANA_DASH";
-            this.Size = new System.Drawing.Size(1000, 700);
+            this.Size = new System.Drawing.Size(1100, 760);
+            ((System.ComponentModel.ISupportInitialize)(this.pnlRoot)).EndInit();
+            this.pnlRoot.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.pnlHeader)).EndInit();
+            this.pnlHeader.ResumeLayout(false);
+            this.pnlHeader.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pnlTopWidgets)).EndInit();
             this.pnlTopWidgets.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.tablePanelWidgets)).EndInit();
@@ -517,6 +725,10 @@ namespace AktarOtomasyon.Forms.Screens.Dashboard
             this.pnlCenter.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerControl1)).EndInit();
             this.splitContainerControl1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.grpChart)).EndInit();
+            this.grpChart.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(xyDiagram1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.chartSalesTrend)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.grpBildirimlerGrid)).EndInit();
             this.grpBildirimlerGrid.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.grdBildirimler)).EndInit();
@@ -525,11 +737,20 @@ namespace AktarOtomasyon.Forms.Screens.Dashboard
             this.grpHareketlerGrid.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.grdHareketler)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.gvHareketler)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pnlActions)).EndInit();
+            this.pnlActions.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.tablePanelActions)).EndInit();
+            this.tablePanelActions.ResumeLayout(false);
             this.ResumeLayout(false);
         }
 
         #endregion
 
+        private DevExpress.XtraEditors.PanelControl pnlRoot;
+        private DevExpress.XtraEditors.PanelControl pnlHeader;
+        private DevExpress.XtraEditors.SimpleButton btnRefresh;
+        private DevExpress.XtraEditors.LabelControl lblSubtitle;
+        private DevExpress.XtraEditors.LabelControl lblWelcome;
         private DevExpress.XtraEditors.PanelControl pnlTopWidgets;
         private DevExpress.Utils.Layout.TablePanel tablePanelWidgets;
         private DevExpress.XtraEditors.PanelControl widgetBildirim;
@@ -550,6 +771,8 @@ namespace AktarOtomasyon.Forms.Screens.Dashboard
         private DevExpress.XtraEditors.LabelControl lblKritikStokTitle;
         private DevExpress.XtraEditors.PanelControl pnlCenter;
         private DevExpress.XtraEditors.SplitContainerControl splitContainerControl1;
+        private DevExpress.XtraEditors.GroupControl grpChart;
+        private DevExpress.XtraCharts.ChartControl chartSalesTrend;
         private DevExpress.XtraEditors.GroupControl grpBildirimlerGrid;
         private DevExpress.XtraGrid.GridControl grdBildirimler;
         private DevExpress.XtraGrid.Views.Grid.GridView gvBildirimler;
@@ -564,5 +787,11 @@ namespace AktarOtomasyon.Forms.Screens.Dashboard
         private DevExpress.XtraGrid.Columns.GridColumn colHareketTip;
         private DevExpress.XtraGrid.Columns.GridColumn colMiktar;
         private DevExpress.XtraGrid.Columns.GridColumn colHareketTarih;
+        private DevExpress.XtraEditors.PanelControl pnlActions;
+        private DevExpress.Utils.Layout.TablePanel tablePanelActions;
+        private DevExpress.XtraEditors.SimpleButton btnAiIcerik;
+        private DevExpress.XtraEditors.SimpleButton btnSiparisOlustur;
+        private DevExpress.XtraEditors.SimpleButton btnUrunEkle;
+        private DevExpress.XtraEditors.SimpleButton btnYeniSatis;
     }
 }
