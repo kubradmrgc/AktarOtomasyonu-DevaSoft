@@ -36,6 +36,50 @@ namespace AktarOtomasyon.Stok.Interface
         /// Ürünün stok durumu detaylarını getirir.
         /// </summary>
         StokDurumDto StokDurumGetir(int urunId);
+
+        /// <summary>
+        /// Ürün + stok birleşik listesi (URUN_STOK paneli).
+        /// </summary>
+        List<StokUrunListeDto> UrunStokListele(string arama = null, int? kategoriId = null, bool sadeceKritik = false);
+    }
+
+    /// <summary>
+    /// Ürün ve stok birleşik satır modeli (URUN_STOK paneli).
+    /// </summary>
+    public class StokUrunListeDto
+    {
+        public int UrunId { get; set; }
+        public string UrunKod { get; set; }
+        public string UrunAdi { get; set; }
+        public string Barkod { get; set; }
+        public int? KategoriId { get; set; }
+        public string KategoriAdi { get; set; }
+        public int? BirimId { get; set; }
+        public string BirimAdi { get; set; }
+        public decimal? SatisFiyati { get; set; }
+        public decimal MevcutStok { get; set; }
+        public decimal KritikStok { get; set; }
+        public decimal EmniyetStok { get; set; }
+        public string Durum { get; set; }
+
+        public string MevcutStokText
+        {
+            get
+            {
+                var birim = string.IsNullOrWhiteSpace(BirimAdi) ? "" : " " + BirimAdi;
+                return string.Format("{0:N2}{1}", MevcutStok, birim);
+            }
+        }
+
+        public string FiyatText
+        {
+            get
+            {
+                return SatisFiyati.HasValue
+                    ? string.Format("₺{0:N2}", SatisFiyati.Value)
+                    : "—";
+            }
+        }
     }
 
     public class StokDurumDto

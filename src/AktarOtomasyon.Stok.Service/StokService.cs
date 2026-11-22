@@ -350,5 +350,49 @@ namespace AktarOtomasyon.Stok.Service
                 return null;
             }
         }
+
+        public List<StokUrunListeDto> UrunStokListele(string arama = null, int? kategoriId = null, bool sadeceKritik = false)
+        {
+            var list = new List<StokUrunListeDto>();
+            try
+            {
+                using (var sMan = new SqlManager())
+                {
+                    var cmd = sMan.CreateCommand("sp_stok_urun_listele", CommandType.StoredProcedure);
+                    cmd.Parameters.Add(new SqlParameter("@arama", SqlDbType.NVarChar, 100)
+                        { Value = string.IsNullOrWhiteSpace(arama) ? (object)DBNull.Value : arama.Trim() });
+                    cmd.Parameters.Add(new SqlParameter("@kategori_id", SqlDbType.Int)
+                        { Value = kategoriId.HasValue ? (object)kategoriId.Value : DBNull.Value });
+                    cmd.Parameters.Add(new SqlParameter("@sadece_kritik", SqlDbType.Bit)
+                        { Value = sadeceKritik });
+
+                    var dt = sMan.ExecuteQuery(cmd);
+                    foreach (DataRow row in dt.Rows)
+                    {
+                        list.Add(new StokUrunListeDto
+                        {
+                            UrunId = Convert.ToInt32(row["urun_id"]),
+                            UrunKod = row["urun_kod"] != DBNull.Value ? row["urun_kod"].ToString() : null,
+                            UrunAdi = row["urun_adi"] != DBNull.Value ? row["urun_adi"].ToString() : null,
+                            Barkod = row["barkod"] != DBNull.Value ? row["barkod"].ToString() : null,
+                            KategoriId = row["kategori_id"] != DBNull.Value ? Convert.ToInt32(row["kategori_id"]) : (int?)null,
+                            KategoriAdi = row["kategori_adi"] != DBNull.Value ? row["kategori_adi"].ToString() : null,
+                            BirimId = row["birim_id"] != DBNull.Value ? Convert.ToInt32(row["birim_id"]) : (int?)null,
+                            BirimAdi = row["birim_adi"] != DBNull.Value ? row["birim_adi"].ToString() : null,
+                            SatisFiyati = row["satis_fiyati"] != DBNull.Value ? Convert.ToDecimal(row["satis_fiyati"]) : (decimal?)null,
+                            MevcutStok = Convert.ToDecimal(row["mevcut_stok"]),
+                            KritikStok = Convert.ToDecimal(row["kritik_stok"]),
+                            EmniyetStok = Convert.ToDecimal(row["emniyet_stok"]),
+                            Durum = row["durum"] != DBNull.Value ? row["durum"].ToString() : "Normal"
+                        });
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Trace.WriteLine("UrunStokListele Error: " + ex.Message);
+            }
+            return list;
+        }
     }
 }

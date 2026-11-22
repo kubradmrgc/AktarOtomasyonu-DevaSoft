@@ -125,5 +125,70 @@ BEGIN
 END
 GO
 
+-- sp_stok_urun_listele (URUN_STOK paneli)
+IF OBJECT_ID('sp_stok_urun_listele', 'P') IS NOT NULL DROP PROCEDURE sp_stok_urun_listele;
+GO
+
+CREATE PROCEDURE [dbo].[sp_stok_urun_listele]
+    @arama NVARCHAR(100) = NULL,
+    @kategori_id INT = NULL,
+    @sadece_kritik BIT = 0
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    WITH StokOzet AS (
+        SELECT
+            urun_id,
+            SUM(CASE WHEN hareket_tip IN ('GIRIS', 'SAYIM') THEN miktar ELSE -miktar END) AS mevcut_stok
+        FROM stok_hareket
+        GROUP BY urun_id
+    )
+    SELECT
+        u.urun_id,
+        u.urun_kod,
+        u.urun_adi,
+        u.barkod,
+        u.kategori_id,
+        k.kategori_adi,
+        u.birim_id,
+        b.birim_adi,
+        u.satis_fiyati,
+        ISNULL(so.mevcut_stok, 0) AS mevcut_stok,
+        ISNULL(sa.kritik_stok, 0) AS kritik_stok,
+        ISNULL(sa.emniyet_stok, sa.kritik_stok) AS emniyet_stok,
+        CASE
+            WHEN ISNULL(so.mevcut_stok, 0) <= ISNULL(sa.kritik_stok, 0) THEN N'Kritik'
+            WHEN ISNULL(so.mevcut_stok, 0) < ISNULL(ISNULL(sa.emniyet_stok, sa.kritik_stok * 1.5), ISNULL(sa.kritik_stok, 0) * 1.5) THEN N'Azalıyor'
+            WHEN ISNULL(so.mevcut_stok, 0) >= ISNULL(sa.hedef_stok, ISNULL(sa.emniyet_stok, sa.kritik_stok) * 2) THEN N'Yeterli'
+            ELSE N'Normal'
+        END AS durum
+    FROM urun u
+    LEFT JOIN urun_kategori k ON u.kategori_id = k.kategori_id
+    LEFT JOIN urun_birim b ON u.birim_id = b.birim_id
+    LEFT JOIN urun_stok_ayar sa ON u.urun_id = sa.urun_id
+    LEFT JOIN StokOzet so ON u.urun_id = so.urun_id
+    WHERE u.aktif = 1
+      AND (@kategori_id IS NULL OR u.kategori_id = @kategori_id)
+      AND (
+            @arama IS NULL OR @arama = N''
+            OR u.urun_kod LIKE N'%' + @arama + N'%'
+            OR u.urun_adi LIKE N'%' + @arama + N'%'
+            OR ISNULL(u.barkod, N'') LIKE N'%' + @arama + N'%'
+          )
+      AND (
+            @sadece_kritik = 0
+            OR ISNULL(so.mevcut_stok, 0) <= ISNULL(sa.kritik_stok, 0)
+          )
+    ORDER BY
+        CASE
+            WHEN ISNULL(so.mevcut_stok, 0) <= ISNULL(sa.kritik_stok, 0) THEN 0
+            WHEN ISNULL(so.mevcut_stok, 0) < ISNULL(ISNULL(sa.emniyet_stok, sa.kritik_stok * 1.5), ISNULL(sa.kritik_stok, 0) * 1.5) THEN 1
+            ELSE 2
+        END,
+        u.urun_adi;
+END
+GO
+
 PRINT 'Stok SP''ler oluşturuldu.'
 GO
