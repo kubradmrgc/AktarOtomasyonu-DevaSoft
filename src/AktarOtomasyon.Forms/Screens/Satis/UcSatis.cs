@@ -31,6 +31,12 @@ namespace AktarOtomasyon.Forms.Screens.Satis
         private MemoEdit memoFayda;
         private LabelControl lblUyari;
 
+        private PanelControl pnlSepetIslem;
+        private SimpleButton btnUrunIptal;
+        private SimpleButton btnFisIptal;
+        private SimpleButton btnEtiketYazdir;
+        private CheckEdit chkEtiketYazdir;
+
         public UcSatis()
         {
             InitializeComponent();
@@ -142,6 +148,9 @@ namespace AktarOtomasyon.Forms.Screens.Satis
             grpUrunGiris.Controls.Add(lkpUrunAra);
             grpUrunGiris.Controls.Add(grpRecete);
 
+            BuildSepetToolbar();
+            BuildAltBarExtras();
+
             grpUrunGiris.Resize += (s, e) =>
             {
                 int w = Math.Max(260, grpUrunGiris.Width - 40);
@@ -156,15 +165,85 @@ namespace AktarOtomasyon.Forms.Screens.Satis
             };
         }
 
+        private void BuildSepetToolbar()
+        {
+            pnlSepetIslem = new PanelControl
+            {
+                Dock = DockStyle.Bottom,
+                Height = 52,
+                Name = "pnlSepetIslem",
+                BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.NoBorder
+            };
+
+            btnUrunIptal = new SimpleButton
+            {
+                Text = "Ürün İptal",
+                Location = new Point(12, 10),
+                Size = new Size(110, 32),
+                Name = "btnUrunIptal"
+            };
+
+            btnFisIptal = new SimpleButton
+            {
+                Text = "Fiş İptal",
+                Location = new Point(130, 10),
+                Size = new Size(100, 32),
+                Name = "btnFisIptal"
+            };
+
+            btnEtiketYazdir = new SimpleButton
+            {
+                Text = "Etiket Yazdır",
+                Location = new Point(238, 10),
+                Size = new Size(120, 32),
+                Name = "btnEtiketYazdir"
+            };
+
+            pnlSepetIslem.Controls.Add(btnUrunIptal);
+            pnlSepetIslem.Controls.Add(btnFisIptal);
+            pnlSepetIslem.Controls.Add(btnEtiketYazdir);
+
+            pnlSepetIslem.Dock = DockStyle.Bottom;
+            grpSepet.Controls.Add(pnlSepetIslem);
+            gcSepet.Dock = DockStyle.Fill;
+            gcSepet.SendToBack();
+            pnlSepetIslem.BringToFront();
+        }
+
+        private void BuildAltBarExtras()
+        {
+            pnlAlt.Height = 96;
+
+            chkEtiketYazdir = new CheckEdit
+            {
+                Text = "Satış sonrası kullanım etiketi yazdır",
+                Location = new Point(20, 58),
+                Size = new Size(280, 24),
+                Name = "chkEtiketYazdir"
+            };
+            chkEtiketYazdir.Checked = true;
+            pnlAlt.Controls.Add(chkEtiketYazdir);
+
+            lblToplamBaslik.Location = new Point(20, 18);
+            lblGenelToplam.Location = new Point(150, 8);
+        }
+
         private void WireExtraEvents()
         {
             lkpUrunAra.EditValueChanged += lkpUrunAra_EditValueChanged;
+            btnUrunIptal.Click += btnUrunIptal_Click;
+            btnFisIptal.Click += btnFisIptal_Click;
+            btnEtiketYazdir.Click += btnEtiketYazdir_Click;
+            gvSepet.KeyDown += gvSepet_KeyDown;
         }
 
         private void ApplyTheme()
         {
             ModernTheme.ApplyModernButton(btnSepeteEkle, ModernTheme.Colors.Primary, true);
             ModernTheme.ApplyModernButton(btnSatisYap, ModernTheme.Colors.Success, true);
+            ModernTheme.ApplyModernButton(btnUrunIptal, ModernTheme.Colors.Warning, true);
+            ModernTheme.ApplyModernButton(btnFisIptal, ModernTheme.Colors.Danger, true);
+            ModernTheme.ApplyModernButton(btnEtiketYazdir, ModernTheme.Colors.Olive, true);
             ModernTheme.ApplyModernGroup(grpUrunGiris);
             ModernTheme.ApplyModernGroup(grpSepet);
             if (grpRecete != null)
@@ -494,6 +573,129 @@ namespace AktarOtomasyon.Forms.Screens.Satis
             gvSepet.BestFitColumns();
         }
 
+        private void btnUrunIptal_Click(object sender, EventArgs e)
+        {
+            UrunIptal();
+        }
+
+        private void btnFisIptal_Click(object sender, EventArgs e)
+        {
+            FisIptal();
+        }
+
+        private void btnEtiketYazdir_Click(object sender, EventArgs e)
+        {
+            if (_sepet.Count == 0)
+            {
+                MessageHelper.ShowWarning("Yazdırılacak ürün yok. Önce sepete ekleyin.");
+                return;
+            }
+
+            var focused = gvSepet.GetFocusedRow() as SepetItem;
+            if (focused != null)
+            {
+                YazdirEtiketler(new List<SepetItem> { focused });
+            }
+            else
+            {
+                YazdirEtiketler(_sepet.ToList());
+            }
+        }
+
+        private void gvSepet_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Delete)
+            {
+                UrunIptal();
+                e.Handled = true;
+            }
+            else if (e.KeyCode == Keys.Escape)
+            {
+                FisIptal();
+                e.Handled = true;
+            }
+        }
+
+        private void UrunIptal()
+        {
+            var item = gvSepet.GetFocusedRow() as SepetItem;
+            if (item == null)
+            {
+                MessageHelper.ShowWarning("İptal edilecek ürünü sepette seçin.");
+                return;
+            }
+
+            if (!MessageHelper.ShowConfirmation(
+                string.Format("\"{0}\" sepetten çıkarılsın mı?", item.UrunAdi)))
+                return;
+
+            _sepet.Remove(item);
+            RefreshSepet();
+            if (_aktifUrun != null && _aktifUrun.UrunId == item.UrunId)
+                ClearAktifUrun();
+            txtBarkod.Focus();
+        }
+
+        private void FisIptal()
+        {
+            if (_sepet.Count == 0)
+            {
+                ClearAktifUrun();
+                txtBarkod.Focus();
+                return;
+            }
+
+            if (!MessageHelper.ShowConfirmation("Fiş iptal edilsin mi? Sepetteki tüm ürünler silinecek."))
+                return;
+
+            _sepet.Clear();
+            RefreshSepet();
+            ClearAktifUrun();
+            txtBarkod.Focus();
+        }
+
+        private void YazdirEtiketler(IList<SepetItem> items)
+        {
+            if (items == null || items.Count == 0)
+                return;
+
+            var culture = CultureInfo.GetCultureInfo("tr-TR");
+            var labels = new List<KullanimEtiketPrinter.EtiketModel>();
+
+            foreach (var item in items)
+            {
+                var parsed = GetAiForUrun(item.UrunId);
+                labels.Add(new KullanimEtiketPrinter.EtiketModel
+                {
+                    UrunAdi = item.UrunAdi,
+                    MiktarText = string.Format(culture, "{0:0.###}", item.Miktar),
+                    Kullanim = !string.IsNullOrWhiteSpace(parsed.Kullanim)
+                        ? parsed.Kullanim
+                        : "Onaylı kullanım tarifi bulunamadı.",
+                    Aciklama = parsed.Aciklama,
+                    Uyari = parsed.Uyari
+                });
+            }
+
+            KullanimEtiketPrinter.PrintLabels(labels, showPrinterDialog: true);
+        }
+
+        private ParsedAi GetAiForUrun(int urunId)
+        {
+            try
+            {
+                var icerik = InterfaceFactory.Ai.IcerikGetir(urunId);
+                if (icerik == null || string.IsNullOrWhiteSpace(icerik.Icerik))
+                    return new ParsedAi();
+                return ParseAiContent(TextHelper.FixEncoding(icerik.Icerik));
+            }
+            catch (Exception ex)
+            {
+                ErrorManager.LogMessage("GetAiForUrun: " + ex.Message, "SATIS");
+                return new ParsedAi();
+            }
+        }
+
         private void btnSatisYap_Click(object sender, EventArgs e)
         {
             if (_sepet.Count == 0)
@@ -526,6 +728,10 @@ namespace AktarOtomasyon.Forms.Screens.Satis
                     });
                 }
 
+                // Etiket için sepet kopyası (temizlemeden önce)
+                var etiketKaynak = _sepet.ToList();
+                bool etiketYaz = chkEtiketYazdir != null && chkEtiketYazdir.Checked;
+
                 var result = InterfaceFactory.Satis.SatisKaydet(model);
                 if (result != null)
                 {
@@ -537,6 +743,11 @@ namespace AktarOtomasyon.Forms.Screens.Satis
                 _sepet.Clear();
                 RefreshSepet();
                 ClearAktifUrun();
+
+                if (etiketYaz)
+                    YazdirEtiketler(etiketKaynak);
+
+                txtBarkod.Focus();
             }
             catch (Exception ex)
             {

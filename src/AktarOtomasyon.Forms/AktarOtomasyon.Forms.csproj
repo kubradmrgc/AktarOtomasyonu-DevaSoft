@@ -191,6 +191,7 @@
     <Compile Include="Common\GridHelper.cs" />
     <Compile Include="Common\IconHelper.cs" />
     <Compile Include="Common\TextHelper.cs" />
+    <Compile Include="Common\KullanimEtiketPrinter.cs" />
     <Compile Include="Common\ImageFileHelper.cs" />
     <Compile Include="Common\EmptyStatePanel.cs">
       <SubType>UserControl</SubType>
