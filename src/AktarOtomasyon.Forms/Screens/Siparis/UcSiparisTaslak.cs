@@ -7,6 +7,7 @@ using AktarOtomasyon.Forms.Base;
 using AktarOtomasyon.Forms.Common;
 using AktarOtomasyon.Forms.Managers;
 using AktarOtomasyon.Siparis.Interface;
+// FrmMain: AktarOtomasyon.Forms
 using DevExpress.XtraGrid.Views.Grid;
 
 namespace AktarOtomasyon.Forms.Screens.Siparis
@@ -299,7 +300,7 @@ namespace AktarOtomasyon.Forms.Screens.Siparis
 
                     if (_siparisModel == null)
                     {
-                        DMLManager.ShowError("Sipariş oluşturulamadı.");
+                        DMLManager.ShowError("Sipariş oluşturulamadı. Tedarikçi ve veritabanı bağlantısını kontrol edin (sp_siparis_getir).");
                         return "Sipariş oluşturulamadı.";
                     }
 
@@ -326,6 +327,8 @@ namespace AktarOtomasyon.Forms.Screens.Siparis
 
                     DMLManager.KaydetKontrol(null);
                     _dataChanged = false;
+
+                    NotifySiparisCountsChanged();
 
                     MessageBox.Show("Sipariş başarıyla oluşturuldu. Şimdi satır ekleyebilirsiniz.",
                         "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -577,6 +580,48 @@ namespace AktarOtomasyon.Forms.Screens.Siparis
         private void memoAciklama_TextChanged(object sender, EventArgs e)
         {
             _dataChanged = true;
+        }
+
+        /// <summary>
+        /// Sipariş kaydı sonrası sidebar rozetleri + açık dashboard/liste ekranlarını yeniler.
+        /// </summary>
+        private void NotifySiparisCountsChanged()
+        {
+            try
+            {
+                var main = FindForm() as FrmMain;
+                if (main == null && FindForm() != null)
+                    main = FindForm().MdiParent as FrmMain;
+                if (main == null)
+                {
+                    foreach (Form f in Application.OpenForms)
+                    {
+                        main = f as FrmMain;
+                        if (main != null) break;
+                    }
+                }
+
+                if (main != null)
+                    main.RefreshSidebarBadges();
+
+                if (main != null)
+                {
+                    foreach (Form child in main.MdiChildren)
+                    {
+                        var baseForm = child as FrmBase;
+                        if (baseForm == null) continue;
+                        if (string.Equals(baseForm.EkranKod, "ANA_DASH", StringComparison.OrdinalIgnoreCase) ||
+                            string.Equals(baseForm.EkranKod, "SIP_LISTE", StringComparison.OrdinalIgnoreCase))
+                        {
+                            baseForm.RefreshScreenData();
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ErrorManager.LogMessage("NotifySiparisCountsChanged: " + ex.Message, "SIP_TASLAK");
+            }
         }
     }
 }

@@ -160,6 +160,8 @@ namespace AktarOtomasyon.Siparis.Service
                     var cmd = sMan.CreateCommand("sp_siparis_listele", CommandType.StoredProcedure);
                     cmd.Parameters.Add(new SqlParameter("@durum", SqlDbType.NVarChar, 20)
                         { Value = DBNull.Value });
+                    cmd.Parameters.Add(new SqlParameter("@page_number", SqlDbType.Int) { Value = 1 });
+                    cmd.Parameters.Add(new SqlParameter("@page_size", SqlDbType.Int) { Value = 200 });
 
                     var dt = sMan.ExecuteQuery(cmd);
 
@@ -533,7 +535,10 @@ namespace AktarOtomasyon.Siparis.Service
 
                     sMan.ExecuteNonQuery(cmd);
 
-                    var siparisId = (int)outputParam.Value;
+                    if (outputParam.Value == null || outputParam.Value == DBNull.Value)
+                        return null;
+
+                    var siparisId = Convert.ToInt32(outputParam.Value);
 
                     // Get and return the created order
                     return Getir(siparisId);
@@ -554,13 +559,29 @@ namespace AktarOtomasyon.Siparis.Service
 
                 using (var sMan = new SqlManager())
                 {
-                    var cmd = sMan.CreateCommand("sp_siparis_getir", CommandType.StoredProcedure);
-                    cmd.Parameters.Add(new SqlParameter("@siparis_id", SqlDbType.Int)
-                        { Value = siparisId });
+                    DataTable dt;
+                    try
+                    {
+                        var cmd = sMan.CreateCommand("sp_siparis_getir", CommandType.StoredProcedure);
+                        cmd.Parameters.Add(new SqlParameter("@siparis_id", SqlDbType.Int)
+                            { Value = siparisId });
+                        dt = sMan.ExecuteQuery(cmd);
+                    }
+                    catch (SqlException)
+                    {
+                        // Fallback if SP missing on older DBs
+                        var cmd = sMan.CreateCommand(@"
+SELECT s.siparis_id, s.siparis_no, s.tedarikci_id, t.tedarikci_adi,
+       s.siparis_tarih, s.beklenen_teslim_tarih, s.durum, s.toplam_tutar, s.aciklama
+FROM dbo.siparis s
+INNER JOIN dbo.tedarikci t ON t.tedarikci_id = s.tedarikci_id
+WHERE s.siparis_id = @siparis_id", CommandType.Text);
+                        cmd.Parameters.Add(new SqlParameter("@siparis_id", SqlDbType.Int)
+                            { Value = siparisId });
+                        dt = sMan.ExecuteQuery(cmd);
+                    }
 
-                    var dt = sMan.ExecuteQuery(cmd);
-
-                    if (dt.Rows.Count == 0)
+                    if (dt == null || dt.Rows.Count == 0)
                         return null;
 
                     var row = dt.Rows[0];

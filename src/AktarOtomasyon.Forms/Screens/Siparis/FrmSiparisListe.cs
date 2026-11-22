@@ -16,6 +16,12 @@ namespace AktarOtomasyon.Forms.Screens.Siparis
             ucSiparisListe.LoadData();
         }
 
+        public override void RefreshScreenData()
+        {
+            if (ucSiparisListe != null)
+                ucSiparisListe.LoadData();
+        }
+
         protected override bool OnayliKapat()
         {
             return true; // Liste ekranlar için değişiklik yok

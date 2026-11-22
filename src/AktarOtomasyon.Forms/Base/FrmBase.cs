@@ -69,6 +69,13 @@ namespace AktarOtomasyon.Forms.Base
         /// <summary>
         /// kul_ekran tablosundan ekran bilgisini yükler ve versiyon loglar.
         /// </summary>
+        /// <summary>
+        /// Ekran zaten açıksa tekrar aktif edildiğinde veri yenilemek için override edilir.
+        /// </summary>
+        public virtual void RefreshScreenData()
+        {
+        }
+
         protected virtual void LoadEkranBilgisi()
         {
             if (string.IsNullOrEmpty(EkranKod))

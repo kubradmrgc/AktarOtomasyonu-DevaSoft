@@ -122,5 +122,59 @@ BEGIN
 END
 GO
 
+-- sp_siparis_getir
+IF OBJECT_ID('sp_siparis_getir', 'P') IS NOT NULL DROP PROCEDURE sp_siparis_getir;
+GO
+
+CREATE PROCEDURE [dbo].[sp_siparis_getir]
+    @siparis_id INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT
+        s.siparis_id,
+        s.siparis_no,
+        s.tedarikci_id,
+        t.tedarikci_adi,
+        s.siparis_tarih,
+        s.beklenen_teslim_tarih,
+        s.teslim_tarih,
+        s.durum,
+        s.toplam_tutar,
+        s.aciklama,
+        s.kullanici_id,
+        s.olusturma_tarih
+    FROM dbo.siparis s
+    INNER JOIN dbo.tedarikci t ON t.tedarikci_id = s.tedarikci_id
+    WHERE s.siparis_id = @siparis_id;
+END
+GO
+
+-- sp_siparis_header_guncelle
+IF OBJECT_ID('sp_siparis_header_guncelle', 'P') IS NOT NULL DROP PROCEDURE sp_siparis_header_guncelle;
+GO
+
+CREATE PROCEDURE [dbo].[sp_siparis_header_guncelle]
+    @siparis_id INT,
+    @tedarikci_id INT,
+    @siparis_tarih DATETIME,
+    @beklenen_teslim_tarih DATETIME = NULL,
+    @aciklama NVARCHAR(500) = NULL
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    UPDATE dbo.siparis
+    SET
+        tedarikci_id = @tedarikci_id,
+        siparis_tarih = @siparis_tarih,
+        beklenen_teslim_tarih = @beklenen_teslim_tarih,
+        aciklama = @aciklama
+    WHERE siparis_id = @siparis_id
+      AND durum = N'TASLAK';
+END
+GO
+
 PRINT 'Siparis SP''ler oluşturuldu.'
 GO

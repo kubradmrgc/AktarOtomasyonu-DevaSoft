@@ -19,6 +19,12 @@ namespace AktarOtomasyon.Forms.Screens.Dashboard
             ucDashboard.LoadData();
         }
 
+        public override void RefreshScreenData()
+        {
+            if (ucDashboard != null)
+                ucDashboard.LoadData();
+        }
+
         protected override bool OnayliKapat()
         {
             return true; // Dashboard has no unsaved changes
