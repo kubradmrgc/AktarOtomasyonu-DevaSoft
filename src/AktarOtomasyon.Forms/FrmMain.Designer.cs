@@ -24,6 +24,7 @@ namespace AktarOtomasyon.Forms
             this.accordionControlElement_UrunListe = new DevExpress.XtraBars.Navigation.AccordionControlElement();
             this.accordionControlElement_UrunKart = new DevExpress.XtraBars.Navigation.AccordionControlElement();
             this.accordionControlElement_Stok = new DevExpress.XtraBars.Navigation.AccordionControlElement();
+            this.accordionControlElement_UrunStok = new DevExpress.XtraBars.Navigation.AccordionControlElement();
             this.accordionControlElement_StokHareket = new DevExpress.XtraBars.Navigation.AccordionControlElement();
             this.accordionControlElement_StokKritik = new DevExpress.XtraBars.Navigation.AccordionControlElement();
             this.accordionControlElement_Siparisler = new DevExpress.XtraBars.Navigation.AccordionControlElement();
@@ -33,6 +34,7 @@ namespace AktarOtomasyon.Forms
             this.accordionControlElement_Satis = new DevExpress.XtraBars.Navigation.AccordionControlElement();
             this.accordionControlElement_BarkodTest = new DevExpress.XtraBars.Navigation.AccordionControlElement();
             this.accordionControlElement_AI = new DevExpress.XtraBars.Navigation.AccordionControlElement();
+            this.accordionControlElement_AiIcerik = new DevExpress.XtraBars.Navigation.AccordionControlElement();
             this.accordionControlElement_AiModul = new DevExpress.XtraBars.Navigation.AccordionControlElement();
             this.accordionControlElement_AiSablonYnt = new DevExpress.XtraBars.Navigation.AccordionControlElement();
             this.accordionControlElement_Yonetim = new DevExpress.XtraBars.Navigation.AccordionControlElement();
@@ -62,6 +64,8 @@ namespace AktarOtomasyon.Forms
             this.accordionControlElement_Urunler,
             this.accordionControlElement_Stok,
             this.accordionControlElement_Siparisler,
+            this.accordionControlElement_Satis,
+            this.accordionControlElement_AI,
             this.accordionControlElement_Raporlar,
             this.accordionControlElement_Yonetim,
             this.accordionControlElement_Kullanici,
@@ -106,10 +110,18 @@ namespace AktarOtomasyon.Forms
             // accordionControlElement_Stok
             // 
             this.accordionControlElement_Stok.Elements.AddRange(new DevExpress.XtraBars.Navigation.AccordionControlElement[] {
+            this.accordionControlElement_UrunStok,
             this.accordionControlElement_StokHareket,
             this.accordionControlElement_StokKritik});
             this.accordionControlElement_Stok.Name = "accordionControlElement_Stok";
             this.accordionControlElement_Stok.Text = "Stok";
+            // 
+            // accordionControlElement_UrunStok
+            // 
+            this.accordionControlElement_UrunStok.Name = "accordionControlElement_UrunStok";
+            this.accordionControlElement_UrunStok.Style = DevExpress.XtraBars.Navigation.ElementStyle.Item;
+            this.accordionControlElement_UrunStok.Text = "Ürünler ve Stok";
+            this.accordionControlElement_UrunStok.Click += new System.EventHandler(this.accordionControlElement_UrunStok_Click);
             // 
             // accordionControlElement_StokHareket
             // 
@@ -155,10 +167,18 @@ namespace AktarOtomasyon.Forms
             // accordionControlElement_AI
             // 
             this.accordionControlElement_AI.Elements.AddRange(new DevExpress.XtraBars.Navigation.AccordionControlElement[] {
+            this.accordionControlElement_AiIcerik,
             this.accordionControlElement_AiModul,
             this.accordionControlElement_AiSablonYnt});
             this.accordionControlElement_AI.Name = "accordionControlElement_AI";
             this.accordionControlElement_AI.Text = "AI İçerik";
+            // 
+            // accordionControlElement_AiIcerik
+            // 
+            this.accordionControlElement_AiIcerik.Name = "accordionControlElement_AiIcerik";
+            this.accordionControlElement_AiIcerik.Style = DevExpress.XtraBars.Navigation.ElementStyle.Item;
+            this.accordionControlElement_AiIcerik.Text = "AI İçerik Asistanı";
+            this.accordionControlElement_AiIcerik.Click += new System.EventHandler(this.accordionControlElement_AiIcerik_Click);
             // 
             // accordionControlElement_AiModul
             // 
@@ -325,6 +345,7 @@ namespace AktarOtomasyon.Forms
         private DevExpress.XtraBars.Navigation.AccordionControlElement accordionControlElement_UrunListe;
         private DevExpress.XtraBars.Navigation.AccordionControlElement accordionControlElement_UrunKart;
         private DevExpress.XtraBars.Navigation.AccordionControlElement accordionControlElement_Stok;
+        private DevExpress.XtraBars.Navigation.AccordionControlElement accordionControlElement_UrunStok;
         private DevExpress.XtraBars.Navigation.AccordionControlElement accordionControlElement_StokHareket;
         private DevExpress.XtraBars.Navigation.AccordionControlElement accordionControlElement_StokKritik;
         private DevExpress.XtraBars.Navigation.AccordionControlElement accordionControlElement_Siparisler;
@@ -334,6 +355,7 @@ namespace AktarOtomasyon.Forms
         private DevExpress.XtraBars.Navigation.AccordionControlElement accordionControlElement_Satis;
         private DevExpress.XtraBars.Navigation.AccordionControlElement accordionControlElement_BarkodTest;
         private DevExpress.XtraBars.Navigation.AccordionControlElement accordionControlElement_AI;
+        private DevExpress.XtraBars.Navigation.AccordionControlElement accordionControlElement_AiIcerik;
         private DevExpress.XtraBars.Navigation.AccordionControlElement accordionControlElement_AiModul;
         private DevExpress.XtraBars.Navigation.AccordionControlElement accordionControlElement_AiSablonYnt;
         private DevExpress.XtraBars.Navigation.AccordionControlElement accordionControlElement_Yonetim;

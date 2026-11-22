@@ -32,6 +32,7 @@ namespace AktarOtomasyon.Forms.Managers
             RegisterScreen("URUN_DETAY", typeof(Screens.Urun.FrmUrunDetay));
 
             // Sprint 3: Stok module
+            RegisterScreen("URUN_STOK", typeof(Screens.Stok.FrmUrunStok));
             RegisterScreen("STOK_HAREKET", typeof(Screens.Stok.FrmStokHareket));
             RegisterScreen("STOK_KRITIK", typeof(Screens.Stok.FrmStokKritik));
 
@@ -44,6 +45,7 @@ namespace AktarOtomasyon.Forms.Managers
             RegisterScreen("SIP_TESLIM", typeof(Screens.Siparis.FrmSiparisTeslim));
 
             // Sprint 5: AI module
+            RegisterScreen("AI_ICERIK", typeof(Screens.Ai.FrmAiIcerik));
             RegisterScreen("AI_MODUL", typeof(Screens.Ai.FrmAiModul));
             RegisterScreen("AI_VERSIYON", typeof(Screens.Ai.FrmAiVersiyonlar));
             RegisterScreen("AI_SABLON_YNT", typeof(Screens.Ai.FrmAiSablonYonetim));
@@ -118,6 +120,9 @@ namespace AktarOtomasyon.Forms.Managers
                 if (existingForm != null)
                 {
                     existingForm.Activate();
+                    var refreshable = existingForm as FrmBase;
+                    if (refreshable != null)
+                        refreshable.RefreshScreenData();
                     return;
                 }
 
@@ -182,6 +187,9 @@ namespace AktarOtomasyon.Forms.Managers
                     if (existingForm != null)
                     {
                         existingForm.Activate();
+                        var refreshable = existingForm as FrmBase;
+                        if (refreshable != null)
+                            refreshable.RefreshScreenData();
                         return;
                     }
                 }

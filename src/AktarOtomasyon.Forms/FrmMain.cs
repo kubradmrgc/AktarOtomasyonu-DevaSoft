@@ -83,6 +83,11 @@ namespace AktarOtomasyon.Forms
             NavigationManager.OpenScreen("URUN_KART", this);
         }
 
+        private void accordionControlElement_UrunStok_Click(object sender, EventArgs e)
+        {
+            NavigationManager.OpenScreen("URUN_STOK", this);
+        }
+
         private void accordionControlElement_StokHareket_Click(object sender, EventArgs e)
         {
             NavigationManager.OpenScreen("STOK_HAREKET", this);
@@ -106,6 +111,11 @@ namespace AktarOtomasyon.Forms
         private void accordionControlElement_SiparisTaslak_Click(object sender, EventArgs e)
         {
             NavigationManager.OpenScreen("SIP_TASLAK", this, null);
+        }
+
+        private void accordionControlElement_AiIcerik_Click(object sender, EventArgs e)
+        {
+            NavigationManager.OpenScreen("AI_ICERIK", this);
         }
 
         private void accordionControlElement_AiModul_Click(object sender, EventArgs e)
@@ -237,6 +247,14 @@ namespace AktarOtomasyon.Forms
         }
 
         /// <summary>
+        /// Sidebar rozetlerini yeniden hesaplar (sipariş/stok/AI değişikliklerinden sonra).
+        /// </summary>
+        public void RefreshSidebarBadges()
+        {
+            UpdateSidebarBadges();
+        }
+
+        /// <summary>
         /// Sidebar accordion öğelerine kritik stok / bekleyen sipariş / AI onay rozetleri ekler.
         /// </summary>
         private void UpdateSidebarBadges()
@@ -269,7 +287,7 @@ namespace AktarOtomasyon.Forms
                             bekleyenSiparis =
                                 Convert.ToInt32(row["taslak_adet"]) +
                                 Convert.ToInt32(row["gonderildi_adet"]) +
-                                Convert.ToInt32(row["kismi_adet"]);
+                                Convert.ToInt32(row["kismi_teslim_adet"]);
                         }
                     }
                 }

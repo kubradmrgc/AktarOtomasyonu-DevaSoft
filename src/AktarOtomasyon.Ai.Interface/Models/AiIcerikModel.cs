@@ -57,4 +57,57 @@ namespace AktarOtomasyon.Ai.Interface
         public decimal? SatisFiyati { get; set; }
         public string Aciklama { get; set; }
     }
+
+    /// <summary>
+    /// AI içerik kuyruk satırı (AI_ICERIK paneli).
+    /// </summary>
+    public class AiIcerikListeDto
+    {
+        public int IcerikId { get; set; }
+        public int UrunId { get; set; }
+        public string UrunKod { get; set; }
+        public string UrunAdi { get; set; }
+        public string KategoriAdi { get; set; }
+        public string SablonKod { get; set; }
+        public string SablonAdi { get; set; }
+        public string Durum { get; set; }
+        public string Icerik { get; set; }
+        public string Kaynaklar { get; set; }
+        public string Provider { get; set; }
+        public DateTime OlusturmaTarih { get; set; }
+        public DateTime? OnayTarih { get; set; }
+
+        public string DurumText
+        {
+            get
+            {
+                if (string.Equals(Durum, "AKTIF", StringComparison.OrdinalIgnoreCase))
+                    return "Onaylandı";
+                if (string.Equals(Durum, "REDDEDILDI", StringComparison.OrdinalIgnoreCase))
+                    return "Reddedildi";
+                return "Onay Bekliyor";
+            }
+        }
+
+        public string MetaText
+        {
+            get
+            {
+                var sablon = string.IsNullOrWhiteSpace(SablonAdi) ? (SablonKod ?? "İçerik") : SablonAdi;
+                return string.Format("{0} • {1}", sablon, FormatRelativeTime(OlusturmaTarih));
+            }
+        }
+
+        private static string FormatRelativeTime(DateTime dt)
+        {
+            var span = DateTime.Now - dt;
+            if (span.TotalMinutes < 60)
+                return string.Format("{0:HH:mm}", dt);
+            if (span.TotalHours < 24 && dt.Date == DateTime.Today)
+                return string.Format("{0:HH:mm}", dt);
+            if (dt.Date == DateTime.Today.AddDays(-1))
+                return string.Format("Dün {0:HH:mm}", dt);
+            return dt.ToString("dd.MM.yyyy HH:mm");
+        }
+    }
 }

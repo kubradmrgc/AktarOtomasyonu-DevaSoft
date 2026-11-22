@@ -166,6 +166,137 @@ namespace AktarOtomasyon.Ai.Service
             }
         }
 
+        public List<AiIcerikListeDto> IcerikListele(string durumGrup = "BEKLEYEN")
+        {
+            var liste = new List<AiIcerikListeDto>();
+            try
+            {
+                using (var sMan = new SqlManager())
+                {
+                    var cmd = sMan.CreateCommand("sp_ai_icerik_listele", CommandType.StoredProcedure);
+                    cmd.Parameters.Add(new SqlParameter("@durum_grup", SqlDbType.NVarChar, 20)
+                        { Value = string.IsNullOrWhiteSpace(durumGrup) ? "BEKLEYEN" : durumGrup });
+
+                    var dt = sMan.ExecuteQuery(cmd);
+                    foreach (DataRow row in dt.Rows)
+                        liste.Add(MapListeRow(row));
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Trace.WriteLine("IcerikListele Error: " + ex.Message);
+            }
+            return liste;
+        }
+
+        public AiIcerikListeDto IcerikGetirById(int icerikId)
+        {
+            try
+            {
+                if (icerikId <= 0)
+                    return null;
+
+                using (var sMan = new SqlManager())
+                {
+                    var cmd = sMan.CreateCommand("sp_ai_icerik_getir_by_id", CommandType.StoredProcedure);
+                    cmd.Parameters.Add(new SqlParameter("@icerik_id", SqlDbType.Int) { Value = icerikId });
+                    var dt = sMan.ExecuteQuery(cmd);
+                    if (dt.Rows.Count == 0)
+                        return null;
+                    return MapListeRow(dt.Rows[0]);
+                }
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        public string IcerikGuncelle(int icerikId, string icerik, string sablonKod = null)
+        {
+            try
+            {
+                if (icerikId <= 0)
+                    return "Geçersiz içerik ID.";
+                if (string.IsNullOrWhiteSpace(icerik))
+                    return "İçerik boş olamaz.";
+
+                var securityError = CheckForbiddenContent(icerik);
+                if (securityError != null)
+                    return securityError;
+
+                using (var sMan = new SqlManager())
+                {
+                    var cmd = sMan.CreateCommand("sp_ai_icerik_guncelle", CommandType.StoredProcedure);
+                    cmd.Parameters.Add(new SqlParameter("@icerik_id", SqlDbType.Int) { Value = icerikId });
+                    cmd.Parameters.Add(new SqlParameter("@icerik", SqlDbType.NVarChar, -1) { Value = icerik });
+                    cmd.Parameters.Add(new SqlParameter("@sablon_kod", SqlDbType.NVarChar, 50)
+                        { Value = (object)sablonKod ?? DBNull.Value });
+                    sMan.ExecuteNonQuery(cmd);
+                    return null;
+                }
+            }
+            catch (SqlException sqlEx)
+            {
+                return string.Format("Veritabanı hatası: {0}", sqlEx.Message);
+            }
+            catch (Exception ex)
+            {
+                return string.Format("İçerik güncellenemedi: {0}", ex.Message);
+            }
+        }
+
+        public string IcerikReddet(int icerikId)
+        {
+            try
+            {
+                if (icerikId <= 0)
+                    return "Geçersiz içerik ID.";
+
+                using (var sMan = new SqlManager())
+                {
+                    var cmd = sMan.CreateCommand("sp_ai_icerik_reddet", CommandType.StoredProcedure);
+                    cmd.Parameters.Add(new SqlParameter("@icerik_id", SqlDbType.Int) { Value = icerikId });
+                    sMan.ExecuteNonQuery(cmd);
+                    return null;
+                }
+            }
+            catch (SqlException sqlEx)
+            {
+                return string.Format("Veritabanı hatası: {0}", sqlEx.Message);
+            }
+            catch (Exception ex)
+            {
+                return string.Format("İçerik reddedilemedi: {0}", ex.Message);
+            }
+        }
+
+        private static AiIcerikListeDto MapListeRow(DataRow row)
+        {
+            return new AiIcerikListeDto
+            {
+                IcerikId = Convert.ToInt32(row["icerik_id"]),
+                UrunId = Convert.ToInt32(row["urun_id"]),
+                UrunKod = row["urun_kod"] != DBNull.Value ? row["urun_kod"].ToString() : null,
+                UrunAdi = row["urun_adi"] != DBNull.Value ? row["urun_adi"].ToString() : null,
+                KategoriAdi = row.Table.Columns.Contains("kategori_adi") && row["kategori_adi"] != DBNull.Value
+                    ? row["kategori_adi"].ToString() : null,
+                SablonKod = row.Table.Columns.Contains("sablon_kod") && row["sablon_kod"] != DBNull.Value
+                    ? row["sablon_kod"].ToString() : null,
+                SablonAdi = row.Table.Columns.Contains("sablon_adi") && row["sablon_adi"] != DBNull.Value
+                    ? row["sablon_adi"].ToString() : null,
+                Durum = row["durum"].ToString(),
+                Icerik = row["icerik"] != DBNull.Value ? row["icerik"].ToString() : null,
+                Kaynaklar = row.Table.Columns.Contains("kaynaklar") && row["kaynaklar"] != DBNull.Value
+                    ? row["kaynaklar"].ToString() : null,
+                Provider = row.Table.Columns.Contains("provider") && row["provider"] != DBNull.Value
+                    ? row["provider"].ToString() : null,
+                OlusturmaTarih = Convert.ToDateTime(row["olusturma_tarih"]),
+                OnayTarih = row.Table.Columns.Contains("onay_tarih") && row["onay_tarih"] != DBNull.Value
+                    ? Convert.ToDateTime(row["onay_tarih"]) : (DateTime?)null
+            };
+        }
+
         public AiUretimSonuc IcerikUret(int urunId, string sablonKod)
         {
             try

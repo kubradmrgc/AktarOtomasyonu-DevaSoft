@@ -30,6 +30,27 @@ namespace AktarOtomasyon.Ai.Interface
         string IcerikOnayla(int icerikId);
 
         /// <summary>
+        /// AI içerik kuyruğunu listeler (AI_ICERIK paneli).
+        /// </summary>
+        /// <param name="durumGrup">BEKLEYEN | ONAYLANAN | HEPSI</param>
+        List<AiIcerikListeDto> IcerikListele(string durumGrup = "BEKLEYEN");
+
+        /// <summary>
+        /// İçerik ID ile detay getirir.
+        /// </summary>
+        AiIcerikListeDto IcerikGetirById(int icerikId);
+
+        /// <summary>
+        /// Taslak içeriği günceller.
+        /// </summary>
+        string IcerikGuncelle(int icerikId, string icerik, string sablonKod = null);
+
+        /// <summary>
+        /// Taslağı reddeder.
+        /// </summary>
+        string IcerikReddet(int icerikId);
+
+        /// <summary>
         /// AI ile içerik üretir.
         /// </summary>
         /// <param name="urunId">Ürün ID</param>

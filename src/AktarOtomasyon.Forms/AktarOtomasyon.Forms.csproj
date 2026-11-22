@@ -278,6 +278,18 @@
     <Compile Include="Screens\Urun\UcUrunDetay.Designer.cs">
       <DependentUpon>UcUrunDetay.cs</DependentUpon>
     </Compile>
+    <Compile Include="Screens\Stok\FrmUrunStok.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Screens\Stok\FrmUrunStok.Designer.cs">
+      <DependentUpon>FrmUrunStok.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Screens\Stok\UcUrunStok.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Screens\Stok\UcUrunStok.Designer.cs">
+      <DependentUpon>UcUrunStok.cs</DependentUpon>
+    </Compile>
     <Compile Include="Screens\Stok\FrmStokHareket.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -373,6 +385,18 @@
     </Compile>
     <Compile Include="Screens\Ai\DlgAiSablonDetay.Designer.cs">
       <DependentUpon>DlgAiSablonDetay.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Screens\Ai\FrmAiIcerik.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Screens\Ai\FrmAiIcerik.Designer.cs">
+      <DependentUpon>FrmAiIcerik.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Screens\Ai\UcAiIcerik.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Screens\Ai\UcAiIcerik.Designer.cs">
+      <DependentUpon>UcAiIcerik.cs</DependentUpon>
     </Compile>
     <Compile Include="Screens\Ai\FrmAiModul.cs">
       <SubType>Form</SubType>

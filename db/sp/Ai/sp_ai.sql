@@ -235,5 +235,120 @@ BEGIN
 END
 GO
 
+-- sp_ai_icerik_listele (AI_ICERIK paneli kuyruğu)
+IF OBJECT_ID('sp_ai_icerik_listele', 'P') IS NOT NULL DROP PROCEDURE sp_ai_icerik_listele;
+GO
+
+CREATE PROCEDURE [dbo].[sp_ai_icerik_listele]
+    @durum_grup NVARCHAR(20) = N'BEKLEYEN' -- BEKLEYEN | ONAYLANAN | HEPSI
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT
+        i.icerik_id,
+        i.urun_id,
+        u.urun_kod,
+        u.urun_adi,
+        k.kategori_adi,
+        i.sablon_kod,
+        s.sablon_adi,
+        i.durum,
+        i.icerik,
+        i.olusturma_tarih,
+        i.onay_tarih
+    FROM ai_urun_icerik i
+    INNER JOIN urun u ON u.urun_id = i.urun_id
+    LEFT JOIN urun_kategori k ON u.kategori_id = k.kategori_id
+    LEFT JOIN ai_sablon s ON s.sablon_kod = i.sablon_kod
+    WHERE (
+            @durum_grup = N'HEPSI'
+            OR (@durum_grup = N'BEKLEYEN' AND i.durum IN (N'TASLAK', N'ONAY_BEKLIYOR'))
+            OR (@durum_grup = N'ONAYLANAN' AND i.durum = N'AKTIF')
+          )
+    ORDER BY
+        CASE WHEN i.durum IN (N'TASLAK', N'ONAY_BEKLIYOR') THEN 0 ELSE 1 END,
+        i.olusturma_tarih DESC;
+END
+GO
+
+-- sp_ai_icerik_getir_by_id
+IF OBJECT_ID('sp_ai_icerik_getir_by_id', 'P') IS NOT NULL DROP PROCEDURE sp_ai_icerik_getir_by_id;
+GO
+
+CREATE PROCEDURE [dbo].[sp_ai_icerik_getir_by_id]
+    @icerik_id INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT
+        i.icerik_id,
+        i.urun_id,
+        u.urun_kod,
+        u.urun_adi,
+        k.kategori_adi,
+        i.sablon_kod,
+        s.sablon_adi,
+        i.durum,
+        i.icerik,
+        i.kaynaklar,
+        i.provider,
+        i.olusturma_tarih,
+        i.onay_tarih
+    FROM ai_urun_icerik i
+    INNER JOIN urun u ON u.urun_id = i.urun_id
+    LEFT JOIN urun_kategori k ON u.kategori_id = k.kategori_id
+    LEFT JOIN ai_sablon s ON s.sablon_kod = i.sablon_kod
+    WHERE i.icerik_id = @icerik_id;
+END
+GO
+
+-- sp_ai_icerik_guncelle (taslak düzenleme)
+IF OBJECT_ID('sp_ai_icerik_guncelle', 'P') IS NOT NULL DROP PROCEDURE sp_ai_icerik_guncelle;
+GO
+
+CREATE PROCEDURE [dbo].[sp_ai_icerik_guncelle]
+    @icerik_id INT,
+    @icerik NVARCHAR(MAX),
+    @sablon_kod NVARCHAR(50) = NULL
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    UPDATE ai_urun_icerik
+    SET icerik = @icerik,
+        sablon_kod = COALESCE(@sablon_kod, sablon_kod)
+    WHERE icerik_id = @icerik_id
+      AND durum IN (N'TASLAK', N'ONAY_BEKLIYOR');
+
+    -- Yeni versiyon kaydı
+    DECLARE @ver INT;
+    SELECT @ver = ISNULL(MAX(versiyon_no), 0) + 1
+    FROM ai_urun_icerik_ver
+    WHERE icerik_id = @icerik_id;
+
+    INSERT INTO ai_urun_icerik_ver (icerik_id, versiyon_no, icerik)
+    VALUES (@icerik_id, @ver, @icerik);
+END
+GO
+
+-- sp_ai_icerik_reddet
+IF OBJECT_ID('sp_ai_icerik_reddet', 'P') IS NOT NULL DROP PROCEDURE sp_ai_icerik_reddet;
+GO
+
+CREATE PROCEDURE [dbo].[sp_ai_icerik_reddet]
+    @icerik_id INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    UPDATE ai_urun_icerik
+    SET durum = N'REDDEDILDI'
+    WHERE icerik_id = @icerik_id
+      AND durum IN (N'TASLAK', N'ONAY_BEKLIYOR');
+END
+GO
+
 PRINT 'AI SP''ler oluşturuldu.'
 GO
