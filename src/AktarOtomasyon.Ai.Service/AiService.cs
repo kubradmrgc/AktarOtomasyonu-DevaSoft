@@ -32,9 +32,11 @@ namespace AktarOtomasyon.Ai.Service
                     {
                         IcerikId = Convert.ToInt32(row["icerik_id"]),
                         UrunId = Convert.ToInt32(row["urun_id"]),
-                        Icerik = row["icerik"].ToString(),
+                        Icerik = FixUtf8Mojibake(row["icerik"].ToString()),
                         Durum = row["durum"].ToString(),
-                        Kaynaklar = row["kaynaklar"] != DBNull.Value ? row["kaynaklar"].ToString() : null,
+                        Kaynaklar = row["kaynaklar"] != DBNull.Value
+                            ? FixUtf8Mojibake(row["kaynaklar"].ToString())
+                            : null,
                         OlusturmaTarih = Convert.ToDateTime(row["olusturma_tarih"]),
                         OnayTarih = row["onay_tarih"] != DBNull.Value ? Convert.ToDateTime(row["onay_tarih"]) : (DateTime?)null
                     };

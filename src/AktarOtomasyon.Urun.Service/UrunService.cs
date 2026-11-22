@@ -103,7 +103,7 @@ namespace AktarOtomasyon.Urun.Service
                 var q = barkod.Trim();
                 using (var sMan = new SqlManager())
                 {
-                    // Önce barkod, bulamazsa urun_kod (manuel tarama / test)
+                    // Barkod → kod → tam ad → ad ile başlayan → ad içeren
                     var query = @"
 SELECT TOP 1 *
 FROM dbo.urun
@@ -111,10 +111,23 @@ WHERE aktif = 1
   AND (
         barkod = @q
      OR urun_kod = @q
+     OR urun_adi = @q
+     OR urun_adi LIKE @qLikeStart
+     OR urun_adi LIKE @qLikeAny
   )
-ORDER BY CASE WHEN barkod = @q THEN 0 ELSE 1 END";
+ORDER BY
+    CASE
+        WHEN barkod = @q THEN 0
+        WHEN urun_kod = @q THEN 1
+        WHEN urun_adi = @q THEN 2
+        WHEN urun_adi LIKE @qLikeStart THEN 3
+        ELSE 4
+    END,
+    urun_adi";
                     var cmd = sMan.CreateCommand(query, CommandType.Text);
-                    cmd.Parameters.Add(new SqlParameter("@q", SqlDbType.NVarChar, 50) { Value = q });
+                    cmd.Parameters.Add(new SqlParameter("@q", SqlDbType.NVarChar, 100) { Value = q });
+                    cmd.Parameters.Add(new SqlParameter("@qLikeStart", SqlDbType.NVarChar, 110) { Value = q + "%" });
+                    cmd.Parameters.Add(new SqlParameter("@qLikeAny", SqlDbType.NVarChar, 110) { Value = "%" + q + "%" });
 
                     return GetirInternal(sMan, cmd);
                 }

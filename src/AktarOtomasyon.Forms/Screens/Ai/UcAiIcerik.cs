@@ -612,11 +612,14 @@ namespace AktarOtomasyon.Forms.Screens.Ai
             lblDetayKod.Text = string.Format("{0}  •  {1}",
                 item.UrunKod ?? "—",
                 string.IsNullOrWhiteSpace(item.KategoriAdi) ? "—" : item.KategoriAdi);
-            lblDetayAd.Text = string.Format("{0} — Taslak İnceleme", item.UrunAdi ?? "—");
+            bool onayli = string.Equals(item.Durum, "AKTIF", StringComparison.OrdinalIgnoreCase);
+            lblDetayAd.Text = string.Format("{0} — {1}",
+                item.UrunAdi ?? "—",
+                onayli ? "Onaylı İçerik" : "Taslak İnceleme");
             lblDetayDurum.Text = item.DurumText;
             StyleDurumBadge(item.DurumText);
 
-            var parsed = ParseContent(item.Icerik);
+            var parsed = ParseContent(TextHelper.FixEncoding(item.Icerik));
             txtBaslik.Text = BuildBaslik(item, parsed);
             memoAciklama.Text = parsed.Aciklama ?? "";
             memoKullanim.Text = parsed.Kullanim ?? "";
