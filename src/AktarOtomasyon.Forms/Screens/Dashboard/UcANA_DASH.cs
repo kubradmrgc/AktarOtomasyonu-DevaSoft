@@ -36,13 +36,13 @@ namespace AktarOtomasyon.Forms.Screens.Dashboard
 
                 GridHelper.FormatDateColumn(colTarih);
                 GridHelper.FormatDateColumn(colHareketTarih);
-                GridHelper.FormatQuantityColumn(colMiktar);
+                // colMiktar AI panelinde sağlayıcı metni gösterdiği için sayı formatı uygulanmaz
 
                 LoadKritikStokWidget();
                 LoadBekleyenSiparisWidget();
                 LoadBildirimWidget();
                 LoadBugunSatisWidget();
-                LoadSonHareketlerWidget();
+                LoadAiIcerikPanel();
                 SetupSalesTrendChart();
                 LoadKritikStokBars();
             }
@@ -205,9 +205,15 @@ namespace AktarOtomasyon.Forms.Screens.Dashboard
                         int toplamBekleyen = taslakAdet + gonderildiAdet + kismiAdet;
                         lblBekleyenSiparisCount.Text = toplamBekleyen.ToString();
 
-                        lblBekleyenSiparisDesc.Text = bekleyenTutar > 0
-                            ? bekleyenTutar.ToString("C2", new CultureInfo("tr-TR"))
-                            : "İşlem bekliyor";
+                        lblBekleyenSiparisDesc.Text = toplamBekleyen > 0
+                            ? string.Format(
+                                new CultureInfo("tr-TR"),
+                                "{0} taslak • {1}",
+                                taslakAdet,
+                                bekleyenTutar > 0
+                                    ? bekleyenTutar.ToString("C2", new CultureInfo("tr-TR"))
+                                    : "satır bekliyor")
+                            : "Bekleyen yok";
                         lblBekleyenSiparisCount.Appearance.ForeColor = toplamBekleyen > 0
                             ? ModernTheme.Colors.Warning
                             : ModernTheme.Colors.Success;
@@ -239,9 +245,11 @@ namespace AktarOtomasyon.Forms.Screens.Dashboard
                 if (aiPendingCount >= 0)
                 {
                     lblBildirimCount.Text = aiPendingCount.ToString();
-                    lblBildirimDesc.Text = aiPendingCount > 0 ? "AI içerik onayı" : "Onay bekleyen yok";
+                    lblBildirimDesc.Text = aiPendingCount > 0
+                        ? "Ürün açıklaması & etiket metni"
+                        : "Onay bekleyen yok";
                     lblBildirimCount.Appearance.ForeColor = aiPendingCount > 0
-                        ? ModernTheme.Colors.Success
+                        ? ModernTheme.Colors.Warning
                         : ModernTheme.Colors.TextSecondary;
                     lblBildirimCount.Appearance.Options.UseForeColor = true;
                     return;
@@ -287,24 +295,47 @@ namespace AktarOtomasyon.Forms.Screens.Dashboard
         }
 
         /// <summary>
-        /// Loads recent stock movements widget
+        /// Sağ panel: onay bekleyen AI ürün içerikleri (odak alanı).
         /// </summary>
-        private void LoadSonHareketlerWidget()
+        private void LoadAiIcerikPanel()
         {
             try
             {
+                grpHareketlerGrid.Text = "AI İçerik Onay Bekleyen";
+                colUrunAd.Caption = "Ürün";
+                colUrunAd.FieldName = "urun_adi";
+                colHareketTip.Caption = "Durum";
+                colHareketTip.FieldName = "durum";
+                colMiktar.Caption = "Sağlayıcı";
+                colMiktar.FieldName = "provider";
+                colHareketTarih.Caption = "Oluşturma";
+                colHareketTarih.FieldName = "olusturma_tarih";
+
                 using (var sMan = new SqlManager())
                 {
-                    var cmd = sMan.CreateCommand("sp_dash_son_stok_hareket");
-                    cmd.Parameters.AddWithValue("@limit", 20);
-                    var dt = sMan.ExecuteQuery(cmd);
+                    if (!TableExists(sMan, "ai_urun_icerik"))
+                    {
+                        grdHareketler.DataSource = null;
+                        return;
+                    }
 
+                    var cmd = sMan.CreateCommand(@"
+SELECT TOP 20
+    u.urun_adi,
+    a.durum,
+    ISNULL(a.provider, N'-') AS provider,
+    a.olusturma_tarih
+FROM dbo.ai_urun_icerik a
+INNER JOIN dbo.urun u ON u.urun_id = a.urun_id
+WHERE a.durum IN (N'TASLAK', N'ONAY_BEKLIYOR')
+ORDER BY a.olusturma_tarih DESC", CommandType.Text);
+                    var dt = sMan.ExecuteQuery(cmd);
                     grdHareketler.DataSource = dt;
                 }
             }
             catch (Exception ex)
             {
-                ErrorManager.LogMessage(string.Format("LoadSonHareketlerWidget error: {0}", ex.Message), "DASHBOARD");
+                ErrorManager.LogMessage(string.Format("LoadAiIcerikPanel error: {0}", ex.Message), "DASHBOARD");
             }
         }
 
@@ -505,9 +536,10 @@ namespace AktarOtomasyon.Forms.Screens.Dashboard
                         var row = dt.Rows[i];
                         string ad = Convert.ToString(row["urun_adi"]);
                         decimal mevcut = Convert.ToDecimal(row["mevcut_stok"]);
+                        if (mevcut < 0) mevcut = 0; // eksi stok gösterilmez; satış değil kalan stok
                         decimal oran = Convert.ToDecimal(row["oran"]);
                         int pct = (int)Math.Max(0, Math.Min(100, Math.Round(oran)));
-                        string qty = string.Format(new CultureInfo("tr-TR"), "{0:0.##}", mevcut);
+                        string qty = string.Format(new CultureInfo("tr-TR"), "{0:0.##} kg", mevcut);
                         bool kritik = oran < 50;
 
                         if (i == 0) ResetKritikBar(lblKritikBar1, lblKritikBar1Qty, prgKritik1, ad, qty, pct, kritik);
@@ -531,8 +563,21 @@ namespace AktarOtomasyon.Forms.Screens.Dashboard
             int percent,
             bool kritik)
         {
-            nameLabel.Text = name;
-            qtyLabel.Text = qty;
+            nameLabel.Text = name ?? "—";
+            qtyLabel.Text = qty ?? "-";
+
+            nameLabel.Appearance.Font = ModernTheme.Typography.Body;
+            nameLabel.Appearance.ForeColor = ModernTheme.Colors.TextPrimary;
+            nameLabel.Appearance.Options.UseFont = true;
+            nameLabel.Appearance.Options.UseForeColor = true;
+
+            qtyLabel.Appearance.Font = ModernTheme.Typography.Caption;
+            qtyLabel.Appearance.ForeColor = kritik
+                ? ModernTheme.Colors.OnTerracottaSoft
+                : ModernTheme.Colors.Olive;
+            qtyLabel.Appearance.Options.UseFont = true;
+            qtyLabel.Appearance.Options.UseForeColor = true;
+
             bar.Properties.Maximum = 100;
             bar.EditValue = percent;
             bar.Properties.StartColor = kritik ? ModernTheme.Colors.Terracotta : ModernTheme.Colors.Olive;

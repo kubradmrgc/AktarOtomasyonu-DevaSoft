@@ -88,7 +88,7 @@ namespace AktarOtomasyon.Forms.Screens.Security
             this.lblTitle.Name = "lblTitle";
             this.lblTitle.Size = new System.Drawing.Size(370, 40);
             this.lblTitle.TabIndex = 0;
-            this.lblTitle.Text = "AKTAR OTOMASYON";
+            this.lblTitle.Text = "DevaSoft";
             // 
             // lblVersion
             // 

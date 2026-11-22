@@ -267,7 +267,7 @@ namespace AktarOtomasyon.Forms.Screens.Dashboard
             this.lblBildirimTitle.Name = "lblBildirimTitle";
             this.lblBildirimTitle.Size = new System.Drawing.Size(111, 17);
             this.lblBildirimTitle.TabIndex = 0;
-            this.lblBildirimTitle.Text = "AI ONAY BEKLEYEN";
+            this.lblBildirimTitle.Text = "AI Onay Bekleyen";
             // 
             // widgetTotalUrun
             // 
@@ -668,7 +668,7 @@ namespace AktarOtomasyon.Forms.Screens.Dashboard
             this.grpHareketlerGrid.Name = "grpHareketlerGrid";
             this.grpHareketlerGrid.Size = new System.Drawing.Size(492, 460);
             this.grpHareketlerGrid.TabIndex = 0;
-            this.grpHareketlerGrid.Text = "Son Hareketler";
+            this.grpHareketlerGrid.Text = "AI İçerik Onay Bekleyen";
             // 
             // grdHareketler
             // 
