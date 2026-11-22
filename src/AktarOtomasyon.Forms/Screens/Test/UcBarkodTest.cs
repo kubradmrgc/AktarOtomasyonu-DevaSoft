@@ -70,9 +70,10 @@ namespace AktarOtomasyon.Forms.Screens.Test
                 return;
             }
 
-            if (barkod.Length < 8 || barkod.Length > 13)
+            // EAN barkod (8-13) veya kısa ürün kodu (örn. BAH001)
+            if (barkod.Length < 3 || barkod.Length > 50)
             {
-                MessageHelper.ShowWarning("Barkod numarası 8-13 karakter arasında olmalıdır.");
+                MessageHelper.ShowWarning("Barkod / ürün kodu 3-50 karakter arasında olmalıdır.");
                 txtBarkod.SelectAll();
                 txtBarkod.Focus();
                 return;

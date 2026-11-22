@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Windows.Forms;
 using AktarOtomasyon.Forms.Base;
@@ -24,6 +25,7 @@ namespace AktarOtomasyon.Forms.Screens.Satis
         {
             _sepet.Clear();
             RefreshSepet();
+            txtBarkod.Properties.NullText = "Barkod veya ürün kodu (örn. 8690000000011)";
             txtBarkod.Focus();
         }
 
@@ -31,17 +33,27 @@ namespace AktarOtomasyon.Forms.Screens.Satis
         {
             if (string.IsNullOrWhiteSpace(barkod)) return;
 
-            var urun = InterfaceFactory.Urun.GetirBarkod(barkod);
+            var urun = InterfaceFactory.Urun.GetirBarkod(barkod.Trim());
             if (urun != null)
             {
+                if (!urun.SatisFiyati.HasValue || urun.SatisFiyati.Value <= 0)
+                {
+                    MessageHelper.ShowWarning("Ürünün satış fiyatı tanımlı değil: " + TextHelper.FixEncoding(urun.UrunAdi));
+                    txtBarkod.Focus();
+                    txtBarkod.SelectAll();
+                    return;
+                }
+
                 SetAktifUrun(urun);
-                SepeteEkle(urun, 1);
+                SepeteEkle(urun, numMiktar.Value > 0 ? numMiktar.Value : 1m);
+                txtBarkod.Text = "";
+                txtBarkod.Focus();
             }
             else
             {
                 MessageHelper.ShowWarning("Ürün bulunamadı: " + barkod);
-                txtBarkod.Text = "";
                 txtBarkod.Focus();
+                txtBarkod.SelectAll();
             }
         }
 
@@ -83,12 +95,13 @@ namespace AktarOtomasyon.Forms.Screens.Satis
         private void SetAktifUrun(UrunModel urun)
         {
             _aktifUrun = urun;
+            var culture = new CultureInfo("tr-TR");
             lblUrunAdi.Text = TextHelper.FixEncoding(urun.UrunAdi);
-            lblFiyat.Text = string.Format("{0:C2}", urun.SatisFiyati);
-
-            // Gorsel Yukle (Basit version)
-            // UcUrunKatalog'daki logic benzeri
-            // (Placeholder for simplicity, can enhance later)
+            lblFiyat.Text = string.Format(
+                culture,
+                "{0:C2}  •  {1}",
+                urun.SatisFiyati ?? 0m,
+                string.IsNullOrWhiteSpace(urun.Barkod) ? urun.UrunKod : urun.Barkod);
         }
 
         private void SepeteEkle(UrunModel urun, decimal miktar)

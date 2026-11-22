@@ -100,12 +100,21 @@ namespace AktarOtomasyon.Urun.Service
             {
                 if (string.IsNullOrWhiteSpace(barkod)) return null;
 
+                var q = barkod.Trim();
                 using (var sMan = new SqlManager())
                 {
-                    // Use direct SQL for efficiency if no specific SP exists for Barcode
-                    var query = "SELECT * FROM urun WHERE barkod = @barkod AND aktif = 1";
+                    // Önce barkod, bulamazsa urun_kod (manuel tarama / test)
+                    var query = @"
+SELECT TOP 1 *
+FROM dbo.urun
+WHERE aktif = 1
+  AND (
+        barkod = @q
+     OR urun_kod = @q
+  )
+ORDER BY CASE WHEN barkod = @q THEN 0 ELSE 1 END";
                     var cmd = sMan.CreateCommand(query, CommandType.Text);
-                    cmd.Parameters.Add(new SqlParameter("@barkod", SqlDbType.NVarChar, 50) { Value = barkod });
+                    cmd.Parameters.Add(new SqlParameter("@q", SqlDbType.NVarChar, 50) { Value = q });
 
                     return GetirInternal(sMan, cmd);
                 }
