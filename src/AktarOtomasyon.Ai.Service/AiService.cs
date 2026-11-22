@@ -369,6 +369,31 @@ namespace AktarOtomasyon.Ai.Service
         }
 
         /// <summary>
+        /// UTF-8 baytlarinin Windows-1252 olarak okunmasindan olusan mojibake'i duzeltir.
+        /// Ornek: "ÃœrÃ¼n" -> "Ürün". Zaten dogru Unicode ise oldugu gibi birakir.
+        /// </summary>
+        private static string FixUtf8Mojibake(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+                return text;
+
+            try
+            {
+                var latin1 = System.Text.Encoding.GetEncoding(1252,
+                    System.Text.EncoderFallback.ExceptionFallback,
+                    System.Text.DecoderFallback.ExceptionFallback);
+                var utf8 = System.Text.Encoding.GetEncoding("utf-8",
+                    System.Text.EncoderFallback.ExceptionFallback,
+                    System.Text.DecoderFallback.ExceptionFallback);
+                return utf8.GetString(latin1.GetBytes(text));
+            }
+            catch
+            {
+                return text;
+            }
+        }
+
+        /// <summary>
         /// Checks content for forbidden medical/health claims.
         /// Returns null if OK, error message if forbidden content found.
         /// </summary>
@@ -463,8 +488,10 @@ namespace AktarOtomasyon.Ai.Service
                         {
                             SablonId = Convert.ToInt32(row["sablon_id"]),
                             SablonKod = row["sablon_kod"].ToString(),
-                            SablonAdi = row["sablon_adi"].ToString(),
-                            Aciklama = row["aciklama"] != DBNull.Value ? row["aciklama"].ToString() : null,
+                            SablonAdi = FixUtf8Mojibake(row["sablon_adi"].ToString()),
+                            Aciklama = row["aciklama"] != DBNull.Value
+                                ? FixUtf8Mojibake(row["aciklama"].ToString())
+                                : null,
                             Aktif = Convert.ToBoolean(row["aktif"])
                         });
                     }

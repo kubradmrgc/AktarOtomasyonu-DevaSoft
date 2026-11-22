@@ -39,7 +39,13 @@ namespace AktarOtomasyon.Forms.Screens.Ai
                 gridSablonlar.BeginUpdate();
 
                 // Load all templates (both active and inactive)
-                _sablonList = InterfaceFactory.Ai.SablonListele(aktif: null);
+                _sablonList = InterfaceFactory.Ai.SablonListele(aktif: null) ?? new List<AiSablonListModel>();
+
+                foreach (var s in _sablonList)
+                {
+                    s.SablonAdi = TextHelper.FixEncoding(s.SablonAdi);
+                    s.Aciklama = TextHelper.FixEncoding(s.Aciklama);
+                }
 
                 gridSablonlar.DataSource = _sablonList;
 

@@ -86,7 +86,7 @@ namespace AktarOtomasyon.Forms.Base
                 var ekran = InterfaceFactory.KulEkran.EkranGetir(EkranKod);
                 if (ekran != null)
                 {
-                    this.Text = ekran.MenudekiAdi;
+                    this.Text = TextHelper.FixEncoding(ekran.MenudekiAdi);
 
                     // Version logging (non-blocking)
                     var versionError = InterfaceFactory.KulEkran.VersiyonLogla(
