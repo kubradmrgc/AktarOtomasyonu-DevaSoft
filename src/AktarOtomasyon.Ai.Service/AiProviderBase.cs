@@ -21,21 +21,90 @@ namespace AktarOtomasyon.Ai.Service
 
         protected AiProviderBase()
         {
-            // API anahtarı önce environment variable'dan, yoksa config'den alınır
-            ApiKey = Environment.GetEnvironmentVariable("AI_API_KEY")
-                     ?? ConfigurationManager.AppSettings["AI_API_KEY"];
+            // Öncelik: ortam değişkeni → yerel gizli dosya → App.config
+            ApiKey = ResolveApiKey();
 
             Model = Environment.GetEnvironmentVariable("AI_MODEL")
                     ?? ConfigurationManager.AppSettings["AI_MODEL"]
-                    ?? "gemini-pro";
+                    ?? "gemini-2.0-flash";
 
             var timeoutStr = ConfigurationManager.AppSettings["AI_TIMEOUT_SECONDS"];
             int t;
-            TimeoutSeconds = int.TryParse(timeoutStr, out t) ? t : 30;
+            TimeoutSeconds = int.TryParse(timeoutStr, out t) ? t : 60;
 
             var retryStr = ConfigurationManager.AppSettings["AI_MAX_RETRY"];
             int r;
-            MaxRetry = int.TryParse(retryStr, out r) ? r : 3;
+            MaxRetry = int.TryParse(retryStr, out r) ? r : 2;
+        }
+
+        private static string ResolveApiKey()
+        {
+            var key = CleanApiKey(Environment.GetEnvironmentVariable("AI_API_KEY"));
+            if (!string.IsNullOrEmpty(key))
+                return key;
+
+            key = CleanApiKey(ReadLocalApiKeyFile());
+            if (!string.IsNullOrEmpty(key))
+                return key;
+
+            return CleanApiKey(ConfigurationManager.AppSettings["AI_API_KEY"]);
+        }
+
+        private static string CleanApiKey(string raw)
+        {
+            if (string.IsNullOrWhiteSpace(raw))
+                return null;
+
+            var key = raw.Trim().Trim('"').Trim('\'');
+            if (key.Length == 0)
+                return null;
+
+            // Placeholder / örnek değerler
+            var upper = key.ToUpperInvariant();
+            if (upper.Contains("YOUR_") || upper.Contains("PLACEHOLDER") || upper == "CHANGEME"
+                || upper == "API_KEY" || upper == "GEMINI_API_KEY")
+                return null;
+
+            return key;
+        }
+
+        private static string ReadLocalApiKeyFile()
+        {
+            try
+            {
+                var baseDir = AppDomain.CurrentDomain.BaseDirectory;
+                var candidates = new[]
+                {
+                    System.IO.Path.Combine(baseDir, "App_Data", "ai.local.key"),
+                    System.IO.Path.Combine(baseDir, "ai.local.key"),
+                    System.IO.Path.Combine(baseDir, "..", "..", "..", "App_Data", "ai.local.key")
+                };
+
+                foreach (var path in candidates)
+                {
+                    var full = System.IO.Path.GetFullPath(path);
+                    if (!System.IO.File.Exists(full))
+                        continue;
+                    var text = System.IO.File.ReadAllText(full);
+                    if (string.IsNullOrWhiteSpace(text))
+                        continue;
+                    // İlk satır veya AI_API_KEY=... formatı
+                    foreach (var line in text.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries))
+                    {
+                        var trimmed = line.Trim();
+                        if (trimmed.StartsWith("#"))
+                            continue;
+                        if (trimmed.StartsWith("AI_API_KEY=", StringComparison.OrdinalIgnoreCase))
+                            return trimmed.Substring("AI_API_KEY=".Length).Trim();
+                        return trimmed;
+                    }
+                }
+            }
+            catch
+            {
+                // ignore file read errors
+            }
+            return null;
         }
 
         /// <summary>
@@ -153,7 +222,8 @@ namespace AktarOtomasyon.Ai.Service
     /// </summary>
     public class GeminiProvider : AiProviderBase
     {
-        private const string GEMINI_API_ENDPOINT = "https://generativelanguage.googleapis.com/v1/models/{0}:generateContent?key={1}";
+        // v1beta: güncel flash modelleri için daha uyumlu
+        private const string GEMINI_API_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models/{0}:generateContent?key={1}";
 
         public override AiUretimSonuc Generate(int urunId, string sablonKod)
         {
@@ -165,7 +235,11 @@ namespace AktarOtomasyon.Ai.Service
                     return new AiUretimSonuc
                     {
                         Basarili = false,
-                        Hata = "API anahtarı yapılandırılmamış. AI_API_KEY environment variable veya App.config ayarını kontrol edin."
+                        Hata = "Geçerli Gemini API anahtarı yok.\n\n"
+                             + "1) Ortam değişkeni: setx AI_API_KEY \"AIza...\"\n"
+                             + "2) veya dosya: App_Data\\ai.local.key (tek satır anahtar)\n"
+                             + "3) Google AI Studio: https://aistudio.google.com/apikey\n\n"
+                             + "App.config içindeki YOUR_GEMINI_API_KEY / boş değer kullanılmaz."
                     };
                 }
 
@@ -195,6 +269,14 @@ namespace AktarOtomasyon.Ai.Service
                     catch (Exception ex)
                     {
                         lastError = ex.Message;
+                        // Geçersiz anahtar / model gibi kalıcı hatalarda tekrar deneme
+                        var msg = (ex.Message ?? string.Empty).ToUpperInvariant();
+                        if (msg.Contains("API_KEY_INVALID") || msg.Contains("API KEY NOT VALID")
+                            || msg.Contains("INVALID_ARGUMENT") || msg.Contains("PERMISSION_DENIED")
+                            || msg.Contains("NOT_FOUND"))
+                        {
+                            break;
+                        }
                         if (retry < MaxRetry)
                         {
                             System.Threading.Thread.Sleep(1000 * (retry + 1)); // Progressive backoff

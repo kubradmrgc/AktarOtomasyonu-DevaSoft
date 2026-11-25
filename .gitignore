@@ -31,6 +31,9 @@ packages/
 **/appsettings.*.json
 !**/appsettings.json
 !**/appsettings.Development.json
+**/ai.local.key
+**/App_Data/ai.local.key
+login.cfg
 
 # OS files
 Thumbs.db
