@@ -70,7 +70,7 @@ namespace AktarOtomasyon.Forms.Screens.Ai
 
             view.OptionsBehavior.Editable = false;
             view.OptionsSelection.EnableAppearanceFocusedCell = false;
-            view.OptionsView.ShowAutoFilterRow = true;
+            GridHelper.DisableColumnFilters(view);
 
             // Set column captions
             if (view.Columns["SablonKod"] != null)

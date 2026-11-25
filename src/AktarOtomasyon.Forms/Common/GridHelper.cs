@@ -32,8 +32,32 @@ namespace AktarOtomasyon.Forms.Common
             gridView.OptionsBehavior.Editable = false;
             gridView.OptionsSelection.EnableAppearanceFocusedCell = false; // Row selection only
             gridView.FocusRectStyle = DrawFocusRectStyle.RowFocus;
-            gridView.OptionsView.ShowAutoFilterRow = true; // Keep filtering
             gridView.OptionsView.ColumnAutoWidth = false; // Horizontal scrolling if needed
+
+            // Filtreleme: ekranın üst arama/filtre paneli kullanılır.
+            // Kolon başı filtre ikonları ve auto-filter satırı kapatılır (görsel gürültü).
+            DisableColumnFilters(gridView);
+        }
+
+        /// <summary>
+        /// Kolon başı filtre ikonlarını ve auto-filter satırını kapatır.
+        /// </summary>
+        public static void DisableColumnFilters(GridView gridView)
+        {
+            if (gridView == null) return;
+
+            gridView.OptionsView.ShowAutoFilterRow = false;
+            gridView.OptionsView.ShowFilterPanelMode = DevExpress.XtraGrid.Views.Base.ShowFilterPanelMode.Never;
+            gridView.OptionsCustomization.AllowFilter = false;
+            gridView.OptionsMenu.EnableColumnMenu = true;
+            gridView.ClearColumnsFilter();
+            gridView.ActiveFilter.Clear();
+
+            foreach (GridColumn column in gridView.Columns)
+            {
+                column.OptionsFilter.AllowFilter = false;
+                column.OptionsFilter.AllowAutoFilter = false;
+            }
         }
 
         /// <summary>

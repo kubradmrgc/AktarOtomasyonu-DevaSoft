@@ -177,7 +177,7 @@ namespace AktarOtomasyon.Forms.Screens.Siparis
             this.gridView.Name = "gridView";
             this.gridView.OptionsBehavior.Editable = false;
             this.gridView.OptionsView.ShowGroupPanel = false;
-            this.gridView.OptionsView.ShowAutoFilterRow = true;
+            this.gridView.OptionsView.ShowAutoFilterRow = false;
             this.gridView.RowCellStyle += new DevExpress.XtraGrid.Views.Grid.RowCellStyleEventHandler(this.gridView_RowCellStyle);
             this.gridView.FocusedRowChanged += new DevExpress.XtraGrid.Views.Base.FocusedRowChangedEventHandler(this.gridView_FocusedRowChanged);
             this.gridView.DoubleClick += new System.EventHandler(this.gridView_DoubleClick);

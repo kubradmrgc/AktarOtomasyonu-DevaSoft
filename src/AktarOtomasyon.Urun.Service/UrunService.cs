@@ -207,9 +207,11 @@ ORDER BY
                     return liste;
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return new List<UrunListeItemDto>();
+                System.Diagnostics.Debug.WriteLine("UrunService.Listele error: " + ex);
+                System.Diagnostics.Trace.WriteLine("UrunService.Listele error: " + ex.Message);
+                throw; // UI tarafı yakalayıp kullanıcıya göstersin; sessiz boş liste yanıltıcı
             }
         }
 

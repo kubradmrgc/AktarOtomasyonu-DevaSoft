@@ -75,7 +75,7 @@ namespace AktarOtomasyon.Forms.Screens.Ai
 
             view.OptionsBehavior.Editable = false;
             view.OptionsSelection.EnableAppearanceFocusedCell = false;
-            view.OptionsView.ShowAutoFilterRow = true;
+            GridHelper.DisableColumnFilters(view);
 
             // Configure columns
             if (view.Columns["VersiyonNo"] != null)
