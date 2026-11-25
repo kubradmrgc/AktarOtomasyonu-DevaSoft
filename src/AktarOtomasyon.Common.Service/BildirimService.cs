@@ -92,10 +92,10 @@ namespace AktarOtomasyon.Common.Service
                         result.Add(new BildirimModel
                         {
                             BildirimId = Convert.ToInt32(row["bildirim_id"]),
-                            BildirimTip = row["bildirim_tip"].ToString(),
-                            Baslik = row["baslik"].ToString(),
-                            Icerik = row["icerik"] != DBNull.Value ? row["icerik"].ToString() : null,
-                            ReferansTip = row["referans_tip"] != DBNull.Value ? row["referans_tip"].ToString() : null,
+                            BildirimTip = EncodingHelper.GetString(row, "bildirim_tip"),
+                            Baslik = EncodingHelper.GetString(row, "baslik"),
+                            Icerik = EncodingHelper.GetString(row, "icerik"),
+                            ReferansTip = EncodingHelper.GetString(row, "referans_tip"),
                             ReferansId = row["referans_id"] != DBNull.Value ? Convert.ToInt32(row["referans_id"]) : (int?)null,
                             Okundu = Convert.ToBoolean(row["okundu"]),
                             KullaniciId = row["kullanici_id"] != DBNull.Value ? Convert.ToInt32(row["kullanici_id"]) : (int?)null,

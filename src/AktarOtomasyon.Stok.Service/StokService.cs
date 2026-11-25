@@ -172,7 +172,7 @@ namespace AktarOtomasyon.Stok.Service
                         result.Add(new StokKritikModel
                         {
                             UrunId = Convert.ToInt32(row["urun_id"]),
-                            UrunAdi = row["urun_adi"].ToString(),
+                            UrunAdi = EncodingHelper.GetString(row, "urun_adi"),
                             MevcutStok = Convert.ToDecimal(row["mevcut_stok"]),
                             MinStok = Convert.ToDecimal(row["min_stok"])
                         });
@@ -204,11 +204,11 @@ namespace AktarOtomasyon.Stok.Service
                         {
                             HareketId = Convert.ToInt32(row["hareket_id"]),
                             UrunId = Convert.ToInt32(row["urun_id"]),
-                            UrunAdi = row["urun_adi"].ToString(),
-                            HareketTip = row["hareket_tip"].ToString(),
+                            UrunAdi = EncodingHelper.GetString(row, "urun_adi"),
+                            HareketTip = EncodingHelper.GetString(row, "hareket_tip"),
                             Miktar = Convert.ToDecimal(row["miktar"]),
                             HareketTarih = Convert.ToDateTime(row["hareket_tarih"]),
-                            Aciklama = row["aciklama"] != DBNull.Value ? row["aciklama"].ToString() : string.Empty,
+                            Aciklama = EncodingHelper.GetString(row, "aciklama") ?? string.Empty,
                             OncekiBakiye = row["onceki_bakiye"] != DBNull.Value ? Convert.ToDecimal(row["onceki_bakiye"]) : 0,
                             SonrakiBakiye = row["sonraki_bakiye"] != DBNull.Value ? Convert.ToDecimal(row["sonraki_bakiye"]) : 0
                         });
@@ -298,7 +298,7 @@ namespace AktarOtomasyon.Stok.Service
                         list.Add(new SatisRaporuDto
                         {
                             UrunId = Convert.ToInt32(row["urun_id"]),
-                            UrunAdi = row["urun_adi"].ToString(),
+                            UrunAdi = EncodingHelper.GetString(row, "urun_adi"),
                             ToplamMiktar = Convert.ToDecimal(row["toplam_miktar"]),
                             IslemSayisi = Convert.ToInt32(row["islem_sayisi"])
                         });
@@ -372,18 +372,18 @@ namespace AktarOtomasyon.Stok.Service
                         list.Add(new StokUrunListeDto
                         {
                             UrunId = Convert.ToInt32(row["urun_id"]),
-                            UrunKod = row["urun_kod"] != DBNull.Value ? row["urun_kod"].ToString() : null,
-                            UrunAdi = row["urun_adi"] != DBNull.Value ? row["urun_adi"].ToString() : null,
-                            Barkod = row["barkod"] != DBNull.Value ? row["barkod"].ToString() : null,
+                            UrunKod = EncodingHelper.GetString(row, "urun_kod"),
+                            UrunAdi = EncodingHelper.GetString(row, "urun_adi"),
+                            Barkod = EncodingHelper.GetString(row, "barkod"),
                             KategoriId = row["kategori_id"] != DBNull.Value ? Convert.ToInt32(row["kategori_id"]) : (int?)null,
-                            KategoriAdi = row["kategori_adi"] != DBNull.Value ? row["kategori_adi"].ToString() : null,
+                            KategoriAdi = EncodingHelper.GetString(row, "kategori_adi"),
                             BirimId = row["birim_id"] != DBNull.Value ? Convert.ToInt32(row["birim_id"]) : (int?)null,
-                            BirimAdi = row["birim_adi"] != DBNull.Value ? row["birim_adi"].ToString() : null,
+                            BirimAdi = EncodingHelper.GetString(row, "birim_adi"),
                             SatisFiyati = row["satis_fiyati"] != DBNull.Value ? Convert.ToDecimal(row["satis_fiyati"]) : (decimal?)null,
                             MevcutStok = Convert.ToDecimal(row["mevcut_stok"]),
                             KritikStok = Convert.ToDecimal(row["kritik_stok"]),
                             EmniyetStok = Convert.ToDecimal(row["emniyet_stok"]),
-                            Durum = row["durum"] != DBNull.Value ? row["durum"].ToString() : "Normal"
+                            Durum = EncodingHelper.GetString(row, "durum") ?? "Normal"
                         });
                     }
                 }

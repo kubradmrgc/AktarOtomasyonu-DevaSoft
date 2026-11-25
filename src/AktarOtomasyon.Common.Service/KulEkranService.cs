@@ -39,11 +39,11 @@ namespace AktarOtomasyon.Common.Service
                     return new KulEkranModel
                     {
                         EkranId = Convert.ToInt32(row["ekran_id"]),
-                        EkranKod = row["ekran_kod"] != DBNull.Value ? row["ekran_kod"].ToString() : null,
-                        MenudekiAdi = row["menudeki_adi"] != DBNull.Value ? row["menudeki_adi"].ToString() : null,
-                        FormAdi = row["form_adi"] != DBNull.Value ? row["form_adi"].ToString() : null,
-                        Modul = row["modul"] != DBNull.Value ? row["modul"].ToString() : null,
-                        Aciklama = row["aciklama"] != DBNull.Value ? row["aciklama"].ToString() : null,
+                        EkranKod = EncodingHelper.GetString(row, "ekran_kod"),
+                        MenudekiAdi = EncodingHelper.GetString(row, "menudeki_adi"),
+                        FormAdi = EncodingHelper.GetString(row, "form_adi"),
+                        Modul = EncodingHelper.GetString(row, "modul"),
+                        Aciklama = EncodingHelper.GetString(row, "aciklama"),
                         Aktif = Convert.ToBoolean(row["aktif"])
                     };
                 }

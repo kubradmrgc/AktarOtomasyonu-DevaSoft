@@ -48,9 +48,9 @@ namespace AktarOtomasyon.Forms.Screens.Ai
                 txtSablonKod.Enabled = true;
             }
 
-            txtSablonAdi.Text = _sablon.SablonAdi ?? string.Empty;
-            memoPromptSablonu.Text = _sablon.PromptSablonu ?? string.Empty;
-            memoAciklama.Text = _sablon.Aciklama ?? string.Empty;
+            txtSablonAdi.Text = TextHelper.FixEncoding(_sablon.SablonAdi) ?? string.Empty;
+            memoPromptSablonu.Text = TextHelper.FixEncoding(_sablon.PromptSablonu) ?? string.Empty;
+            memoAciklama.Text = TextHelper.FixEncoding(_sablon.Aciklama) ?? string.Empty;
             chkAktif.Checked = _sablon.Aktif;
 
             // Set focus to first input

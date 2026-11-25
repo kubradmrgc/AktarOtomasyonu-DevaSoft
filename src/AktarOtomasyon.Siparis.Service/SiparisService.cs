@@ -132,7 +132,7 @@ namespace AktarOtomasyon.Siparis.Service
                             SatirId = Convert.ToInt32(row["satir_id"]),
                             SiparisId = Convert.ToInt32(row["siparis_id"]),
                             UrunId = Convert.ToInt32(row["urun_id"]),
-                            UrunAdi = row["urun_adi"].ToString(),
+                            UrunAdi = EncodingHelper.GetString(row, "urun_adi"),
                             Miktar = Convert.ToDecimal(row["miktar"]),
                             BirimFiyat = Convert.ToDecimal(row["birim_fiyat"]),
                             Tutar = Convert.ToDecimal(row["tutar"]),
@@ -170,9 +170,9 @@ namespace AktarOtomasyon.Siparis.Service
                         result.Add(new SiparisModel
                         {
                             SiparisId = Convert.ToInt32(row["siparis_id"]),
-                            SiparisNo = row["siparis_no"].ToString(),
+                            SiparisNo = EncodingHelper.GetString(row, "siparis_no"),
                             TedarikciId = Convert.ToInt32(row["tedarikci_id"]),
-                            TedarikciAdi = row["tedarikci_adi"].ToString(),
+                            TedarikciAdi = EncodingHelper.GetString(row, "tedarikci_adi"),
                             SiparisTarih = Convert.ToDateTime(row["siparis_tarih"]),
                             BeklenenTeslimTarih = row["beklenen_teslim_tarih"] != DBNull.Value
                                 ? Convert.ToDateTime(row["beklenen_teslim_tarih"])
@@ -588,16 +588,16 @@ WHERE s.siparis_id = @siparis_id", CommandType.Text);
                     return new SiparisModel
                     {
                         SiparisId = Convert.ToInt32(row["siparis_id"]),
-                        SiparisNo = row["siparis_no"].ToString(),
+                        SiparisNo = EncodingHelper.GetString(row, "siparis_no"),
                         TedarikciId = Convert.ToInt32(row["tedarikci_id"]),
-                        TedarikciAdi = row["tedarikci_adi"].ToString(),
+                        TedarikciAdi = EncodingHelper.GetString(row, "tedarikci_adi"),
                         SiparisTarih = Convert.ToDateTime(row["siparis_tarih"]),
                         BeklenenTeslimTarih = row["beklenen_teslim_tarih"] != DBNull.Value
                             ? Convert.ToDateTime(row["beklenen_teslim_tarih"])
                             : (DateTime?)null,
                         Durum = row["durum"].ToString(),
                         ToplamTutar = Convert.ToDecimal(row["toplam_tutar"]),
-                        Aciklama = row["aciklama"] != DBNull.Value ? row["aciklama"].ToString() : string.Empty
+                        Aciklama = EncodingHelper.GetString(row, "aciklama") ?? string.Empty
                     };
                 }
             }
@@ -777,3 +777,4 @@ WHERE s.siparis_id = @siparis_id", CommandType.Text);
         }
     }
 }
+

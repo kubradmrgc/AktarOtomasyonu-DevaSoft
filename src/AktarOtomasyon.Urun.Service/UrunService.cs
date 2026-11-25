@@ -148,14 +148,14 @@ ORDER BY
             return new UrunModel
             {
                 UrunId = Convert.ToInt32(row["urun_id"]),
-                UrunKod = row["urun_kod"] != DBNull.Value ? row["urun_kod"].ToString() : null,
-                UrunAdi = row["urun_adi"] != DBNull.Value ? row["urun_adi"].ToString() : null,
+                UrunKod = EncodingHelper.GetString(row, "urun_kod"),
+                UrunAdi = EncodingHelper.GetString(row, "urun_adi"),
                 KategoriId = row["kategori_id"] != DBNull.Value ? Convert.ToInt32(row["kategori_id"]) : (int?)null,
                 BirimId = row["birim_id"] != DBNull.Value ? Convert.ToInt32(row["birim_id"]) : (int?)null,
                 AlisFiyati = row["alis_fiyati"] != DBNull.Value ? Convert.ToDecimal(row["alis_fiyati"]) : (decimal?)null,
                 SatisFiyati = row["satis_fiyati"] != DBNull.Value ? Convert.ToDecimal(row["satis_fiyati"]) : (decimal?)null,
-                Barkod = row["barkod"] != DBNull.Value ? row["barkod"].ToString() : null,
-                Aciklama = row["aciklama"] != DBNull.Value ? row["aciklama"].ToString() : null,
+                Barkod = EncodingHelper.GetString(row, "barkod"),
+                Aciklama = EncodingHelper.GetString(row, "aciklama"),
                 Aktif = Convert.ToBoolean(row["aktif"])
             };
         }
@@ -182,23 +182,24 @@ ORDER BY
 
                     foreach (DataRow row in dt.Rows)
                     {
+                        var gorsel = EncodingHelper.GetString(row, "ana_gorsel_path");
                         liste.Add(new UrunListeItemDto
                         {
                             UrunId = Convert.ToInt32(row["urun_id"]),
-                            UrunKod = row["urun_kod"] != DBNull.Value ? row["urun_kod"].ToString() : null,
-                            UrunAdi = row["urun_adi"] != DBNull.Value ? row["urun_adi"].ToString() : null,
+                            UrunKod = EncodingHelper.GetString(row, "urun_kod"),
+                            UrunAdi = EncodingHelper.GetString(row, "urun_adi"),
                             KategoriId = row["kategori_id"] != DBNull.Value ? Convert.ToInt32(row["kategori_id"]) : (int?)null,
-                            KategoriAdi = row["kategori_adi"] != DBNull.Value ? row["kategori_adi"].ToString() : null,
+                            KategoriAdi = EncodingHelper.GetString(row, "kategori_adi"),
                             BirimId = row["birim_id"] != DBNull.Value ? Convert.ToInt32(row["birim_id"]) : (int?)null,
-                            BirimAdi = row["birim_adi"] != DBNull.Value ? row["birim_adi"].ToString() : null,
+                            BirimAdi = EncodingHelper.GetString(row, "birim_adi"),
                             AlisFiyati = row["alis_fiyati"] != DBNull.Value ? Convert.ToDecimal(row["alis_fiyati"]) : (decimal?)null,
                             SatisFiyati = row["satis_fiyati"] != DBNull.Value ? Convert.ToDecimal(row["satis_fiyati"]) : (decimal?)null,
-                            Barkod = row["barkod"] != DBNull.Value ? row["barkod"].ToString() : null,
+                            Barkod = EncodingHelper.GetString(row, "barkod"),
                             Aktif = Convert.ToBoolean(row["aktif"]),
-                            AnaGorselPath = dt.Columns.Contains("ana_gorsel_path") && row["ana_gorsel_path"] != DBNull.Value 
-                                ? (row["ana_gorsel_path"].ToString().StartsWith("App_Data") 
-                                    ? Path.Combine(AppDomain.CurrentDomain.BaseDirectory, row["ana_gorsel_path"].ToString().Replace('/', Path.DirectorySeparatorChar))
-                                    : row["ana_gorsel_path"].ToString().Replace('/', Path.DirectorySeparatorChar))
+                            AnaGorselPath = !string.IsNullOrEmpty(gorsel)
+                                ? (gorsel.StartsWith("App_Data")
+                                    ? Path.Combine(AppDomain.CurrentDomain.BaseDirectory, gorsel.Replace('/', Path.DirectorySeparatorChar))
+                                    : gorsel.Replace('/', Path.DirectorySeparatorChar))
                                 : null
                         });
                     }
@@ -306,10 +307,10 @@ ORDER BY
                     return new UrunKategoriDto
                     {
                         KategoriId = Convert.ToInt32(row["kategori_id"]),
-                        KategoriKod = row["kategori_kod"] != DBNull.Value ? row["kategori_kod"].ToString() : null,
-                        KategoriAdi = row["kategori_adi"] != DBNull.Value ? row["kategori_adi"].ToString() : null,
+                        KategoriKod = EncodingHelper.GetString(row, "kategori_kod"),
+                        KategoriAdi = EncodingHelper.GetString(row, "kategori_adi"),
                         UstKategoriId = row["ust_kategori_id"] != DBNull.Value ? Convert.ToInt32(row["ust_kategori_id"]) : (int?)null,
-                        UstKategoriAdi = row["ust_kategori_adi"] != DBNull.Value ? row["ust_kategori_adi"].ToString() : null,
+                        UstKategoriAdi = EncodingHelper.GetString(row, "ust_kategori_adi"),
                         Aktif = Convert.ToBoolean(row["aktif"])
                     };
                 }
@@ -342,10 +343,10 @@ ORDER BY
                         liste.Add(new UrunKategoriDto
                         {
                             KategoriId = Convert.ToInt32(row["kategori_id"]),
-                            KategoriKod = row["kategori_kod"] != DBNull.Value ? row["kategori_kod"].ToString() : null,
-                            KategoriAdi = row["kategori_adi"] != DBNull.Value ? row["kategori_adi"].ToString() : null,
+                            KategoriKod = EncodingHelper.GetString(row, "kategori_kod"),
+                            KategoriAdi = EncodingHelper.GetString(row, "kategori_adi"),
                             UstKategoriId = row["ust_kategori_id"] != DBNull.Value ? Convert.ToInt32(row["ust_kategori_id"]) : (int?)null,
-                            UstKategoriAdi = row["ust_kategori_adi"] != DBNull.Value ? row["ust_kategori_adi"].ToString() : null,
+                            UstKategoriAdi = EncodingHelper.GetString(row, "ust_kategori_adi"),
                             Aktif = Convert.ToBoolean(row["aktif"]),
                             UrunSayisi = Convert.ToInt32(row["urun_sayisi"])
                         });
@@ -451,8 +452,8 @@ ORDER BY
                     return new UrunBirimDto
                     {
                         BirimId = Convert.ToInt32(row["birim_id"]),
-                        BirimKod = row["birim_kod"] != DBNull.Value ? row["birim_kod"].ToString() : null,
-                        BirimAdi = row["birim_adi"] != DBNull.Value ? row["birim_adi"].ToString() : null,
+                        BirimKod = EncodingHelper.GetString(row, "birim_kod"),
+                        BirimAdi = EncodingHelper.GetString(row, "birim_adi"),
                         Aktif = Convert.ToBoolean(row["aktif"])
                     };
                 }
@@ -481,8 +482,8 @@ ORDER BY
                         liste.Add(new UrunBirimDto
                         {
                             BirimId = Convert.ToInt32(row["birim_id"]),
-                            BirimKod = row["birim_kod"] != DBNull.Value ? row["birim_kod"].ToString() : null,
-                            BirimAdi = row["birim_adi"] != DBNull.Value ? row["birim_adi"].ToString() : null,
+                            BirimKod = EncodingHelper.GetString(row, "birim_kod"),
+                            BirimAdi = EncodingHelper.GetString(row, "birim_adi"),
                             Aktif = Convert.ToBoolean(row["aktif"]),
                             UrunSayisi = Convert.ToInt32(row["urun_sayisi"])
                         });

@@ -32,11 +32,9 @@ namespace AktarOtomasyon.Ai.Service
                     {
                         IcerikId = Convert.ToInt32(row["icerik_id"]),
                         UrunId = Convert.ToInt32(row["urun_id"]),
-                        Icerik = FixUtf8Mojibake(row["icerik"].ToString()),
-                        Durum = row["durum"].ToString(),
-                        Kaynaklar = row["kaynaklar"] != DBNull.Value
-                            ? FixUtf8Mojibake(row["kaynaklar"].ToString())
-                            : null,
+                        Icerik = EncodingHelper.GetString(row, "icerik"),
+                        Durum = EncodingHelper.GetString(row, "durum"),
+                        Kaynaklar = EncodingHelper.GetString(row, "kaynaklar"),
                         OlusturmaTarih = Convert.ToDateTime(row["olusturma_tarih"]),
                         OnayTarih = row["onay_tarih"] != DBNull.Value ? Convert.ToDateTime(row["onay_tarih"]) : (DateTime?)null
                     };
@@ -279,20 +277,15 @@ namespace AktarOtomasyon.Ai.Service
             {
                 IcerikId = Convert.ToInt32(row["icerik_id"]),
                 UrunId = Convert.ToInt32(row["urun_id"]),
-                UrunKod = row["urun_kod"] != DBNull.Value ? row["urun_kod"].ToString() : null,
-                UrunAdi = row["urun_adi"] != DBNull.Value ? row["urun_adi"].ToString() : null,
-                KategoriAdi = row.Table.Columns.Contains("kategori_adi") && row["kategori_adi"] != DBNull.Value
-                    ? row["kategori_adi"].ToString() : null,
-                SablonKod = row.Table.Columns.Contains("sablon_kod") && row["sablon_kod"] != DBNull.Value
-                    ? row["sablon_kod"].ToString() : null,
-                SablonAdi = row.Table.Columns.Contains("sablon_adi") && row["sablon_adi"] != DBNull.Value
-                    ? row["sablon_adi"].ToString() : null,
-                Durum = row["durum"].ToString(),
-                Icerik = row["icerik"] != DBNull.Value ? row["icerik"].ToString() : null,
-                Kaynaklar = row.Table.Columns.Contains("kaynaklar") && row["kaynaklar"] != DBNull.Value
-                    ? row["kaynaklar"].ToString() : null,
-                Provider = row.Table.Columns.Contains("provider") && row["provider"] != DBNull.Value
-                    ? row["provider"].ToString() : null,
+                UrunKod = EncodingHelper.GetString(row, "urun_kod"),
+                UrunAdi = EncodingHelper.GetString(row, "urun_adi"),
+                KategoriAdi = EncodingHelper.GetString(row, "kategori_adi"),
+                SablonKod = EncodingHelper.GetString(row, "sablon_kod"),
+                SablonAdi = EncodingHelper.GetString(row, "sablon_adi"),
+                Durum = EncodingHelper.GetString(row, "durum"),
+                Icerik = EncodingHelper.GetString(row, "icerik"),
+                Kaynaklar = EncodingHelper.GetString(row, "kaynaklar"),
+                Provider = EncodingHelper.GetString(row, "provider"),
                 OlusturmaTarih = Convert.ToDateTime(row["olusturma_tarih"]),
                 OnayTarih = row.Table.Columns.Contains("onay_tarih") && row["onay_tarih"] != DBNull.Value
                     ? Convert.ToDateTime(row["onay_tarih"]) : (DateTime?)null
@@ -371,31 +364,6 @@ namespace AktarOtomasyon.Ai.Service
         }
 
         /// <summary>
-        /// UTF-8 baytlarinin Windows-1252 olarak okunmasindan olusan mojibake'i duzeltir.
-        /// Ornek: "ÃœrÃ¼n" -> "Ürün". Zaten dogru Unicode ise oldugu gibi birakir.
-        /// </summary>
-        private static string FixUtf8Mojibake(string text)
-        {
-            if (string.IsNullOrEmpty(text))
-                return text;
-
-            try
-            {
-                var latin1 = System.Text.Encoding.GetEncoding(1252,
-                    System.Text.EncoderFallback.ExceptionFallback,
-                    System.Text.DecoderFallback.ExceptionFallback);
-                var utf8 = System.Text.Encoding.GetEncoding("utf-8",
-                    System.Text.EncoderFallback.ExceptionFallback,
-                    System.Text.DecoderFallback.ExceptionFallback);
-                return utf8.GetString(latin1.GetBytes(text));
-            }
-            catch
-            {
-                return text;
-            }
-        }
-
-        /// <summary>
         /// Checks content for forbidden medical/health claims.
         /// Returns null if OK, error message if forbidden content found.
         /// </summary>
@@ -457,10 +425,10 @@ namespace AktarOtomasyon.Ai.Service
                     return new AiSablonModel
                     {
                         SablonId = Convert.ToInt32(row["sablon_id"]),
-                        SablonKod = row["sablon_kod"].ToString(),
-                        SablonAdi = row["sablon_adi"].ToString(),
-                        PromptSablonu = row["prompt_sablonu"].ToString(),
-                        Aciklama = row["aciklama"] != DBNull.Value ? row["aciklama"].ToString() : null,
+                        SablonKod = EncodingHelper.GetString(row, "sablon_kod"),
+                        SablonAdi = EncodingHelper.GetString(row, "sablon_adi"),
+                        PromptSablonu = EncodingHelper.GetString(row, "prompt_sablonu"),
+                        Aciklama = EncodingHelper.GetString(row, "aciklama"),
                         Aktif = Convert.ToBoolean(row["aktif"])
                     };
                 }
@@ -489,11 +457,9 @@ namespace AktarOtomasyon.Ai.Service
                         liste.Add(new AiSablonListModel
                         {
                             SablonId = Convert.ToInt32(row["sablon_id"]),
-                            SablonKod = row["sablon_kod"].ToString(),
-                            SablonAdi = FixUtf8Mojibake(row["sablon_adi"].ToString()),
-                            Aciklama = row["aciklama"] != DBNull.Value
-                                ? FixUtf8Mojibake(row["aciklama"].ToString())
-                                : null,
+                            SablonKod = EncodingHelper.GetString(row, "sablon_kod"),
+                            SablonAdi = EncodingHelper.GetString(row, "sablon_adi"),
+                            Aciklama = EncodingHelper.GetString(row, "aciklama"),
                             Aktif = Convert.ToBoolean(row["aktif"])
                         });
                     }

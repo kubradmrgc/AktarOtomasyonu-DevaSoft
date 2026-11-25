@@ -133,7 +133,14 @@ namespace AktarOtomasyon.Forms.Screens.Template
                     Arama = string.IsNullOrWhiteSpace(txtArama.Text) ? null : txtArama.Text.Trim()
                 };
 
-                var liste = InterfaceFactory.Template.TemplateListele(filtre);
+                var liste = InterfaceFactory.Template.TemplateListele(filtre) ?? new List<TemplateListeItemDto>();
+                foreach (var t in liste)
+                {
+                    t.TemplateAdi = TextHelper.FixEncoding(t.TemplateAdi);
+                    t.Aciklama = TextHelper.FixEncoding(t.Aciklama);
+                    t.Modul = TextHelper.FixEncoding(t.Modul);
+                    t.TemplateKod = TextHelper.FixEncoding(t.TemplateKod);
+                }
 
                 gvTemplateList.BeginUpdate();
                 _templateList = new BindingList<TemplateListeItemDto>(liste);
@@ -203,11 +210,11 @@ namespace AktarOtomasyon.Forms.Screens.Template
             if (_currentTemplate == null)
                 return;
 
-            txtTemplateKod.Text = _currentTemplate.TemplateKod;
+            txtTemplateKod.Text = TextHelper.FixEncoding(_currentTemplate.TemplateKod);
             txtTemplateKod.Enabled = _isNewTemplate; // Only editable on create
-            txtTemplateAdi.Text = _currentTemplate.TemplateAdi;
-            cmbDetayModul.EditValue = _currentTemplate.Modul;
-            memoAciklama.Text = _currentTemplate.Aciklama;
+            txtTemplateAdi.Text = TextHelper.FixEncoding(_currentTemplate.TemplateAdi);
+            cmbDetayModul.EditValue = TextHelper.FixEncoding(_currentTemplate.Modul);
+            memoAciklama.Text = TextHelper.FixEncoding(_currentTemplate.Aciklama);
             chkDetayAktif.Checked = _currentTemplate.Aktif;
 
             if (_currentTemplate.AktifVersionNo.HasValue)

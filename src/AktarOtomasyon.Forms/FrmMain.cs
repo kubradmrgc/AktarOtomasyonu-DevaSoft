@@ -39,7 +39,7 @@ namespace AktarOtomasyon.Forms
                 var ekranBilgi = InterfaceFactory.KulEkran.EkranGetir(EKRAN_KOD);
                 if (ekranBilgi != null)
                 {
-                    this.Text = ekranBilgi.MenudekiAdi;
+                    this.Text = TextHelper.FixEncoding(ekranBilgi.MenudekiAdi);
                     InterfaceFactory.KulEkran.VersiyonLogla(EKRAN_KOD, CommonFunction.GetAppVersion());
                 }
                 else
