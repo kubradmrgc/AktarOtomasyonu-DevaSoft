@@ -26,7 +26,7 @@ namespace AktarOtomasyon.Ai.Service
 
             Model = Environment.GetEnvironmentVariable("AI_MODEL")
                     ?? ConfigurationManager.AppSettings["AI_MODEL"]
-                    ?? "gemini-2.0-flash";
+                    ?? "gemini-3.5-flash";
 
             var timeoutStr = ConfigurationManager.AppSettings["AI_TIMEOUT_SECONDS"];
             int t;
@@ -254,34 +254,43 @@ namespace AktarOtomasyon.Ai.Service
                     };
                 }
 
-                // 3. Call Gemini API with retry logic
+                // 3. Call Gemini API — yoğunlukta (503) yedek modellere düş
                 string icerik = null;
                 string lastError = null;
+                var modelsToTry = BuildModelFallbackList(Model);
 
-                for (int retry = 0; retry <= MaxRetry; retry++)
+                foreach (var modelName in modelsToTry)
                 {
-                    try
+                    for (int retry = 0; retry <= MaxRetry; retry++)
                     {
-                        icerik = CallGeminiApi(prompt);
-                        if (!string.IsNullOrWhiteSpace(icerik))
-                            break; // Success
-                    }
-                    catch (Exception ex)
-                    {
-                        lastError = ex.Message;
-                        // Geçersiz anahtar / model gibi kalıcı hatalarda tekrar deneme
-                        var msg = (ex.Message ?? string.Empty).ToUpperInvariant();
-                        if (msg.Contains("API_KEY_INVALID") || msg.Contains("API KEY NOT VALID")
-                            || msg.Contains("INVALID_ARGUMENT") || msg.Contains("PERMISSION_DENIED")
-                            || msg.Contains("NOT_FOUND"))
+                        try
                         {
-                            break;
+                            icerik = CallGeminiApi(prompt, modelName);
+                            if (!string.IsNullOrWhiteSpace(icerik))
+                                break;
                         }
-                        if (retry < MaxRetry)
+                        catch (Exception ex)
                         {
-                            System.Threading.Thread.Sleep(1000 * (retry + 1)); // Progressive backoff
+                            lastError = ex.Message;
+                            var msg = (ex.Message ?? string.Empty).ToUpperInvariant();
+                            if (msg.Contains("API_KEY_INVALID") || msg.Contains("API KEY NOT VALID")
+                                || msg.Contains("PERMISSION_DENIED"))
+                            {
+                                return new AiUretimSonuc { Basarili = false, Hata = lastError };
+                            }
+                            // Model yok / 503 → bir sonraki modele geç
+                            if (msg.Contains("NOT_FOUND") || msg.Contains("NO LONGER AVAILABLE")
+                                || msg.Contains("(404)") || msg.Contains("503")
+                                || msg.Contains("UNAVAILABLE") || msg.Contains("HIGH DEMAND"))
+                            {
+                                break;
+                            }
+                            if (retry < MaxRetry)
+                                System.Threading.Thread.Sleep(800 * (retry + 1));
                         }
                     }
+                    if (!string.IsNullOrWhiteSpace(icerik))
+                        break;
                 }
 
                 if (string.IsNullOrWhiteSpace(icerik))
@@ -289,7 +298,10 @@ namespace AktarOtomasyon.Ai.Service
                     return new AiUretimSonuc
                     {
                         Basarili = false,
-                        Hata = string.Format("Gemini API çağrısı başarısız (deneme: {0}). Son hata: {1}", MaxRetry + 1, lastError)
+                        Hata = string.Format(
+                            "Gemini API çağrısı başarısız (modeller: {0}). Son hata: {1}",
+                            string.Join(", ", modelsToTry),
+                            lastError)
                     };
                 }
 
@@ -310,15 +322,32 @@ namespace AktarOtomasyon.Ai.Service
             }
         }
 
+        private static System.Collections.Generic.List<string> BuildModelFallbackList(string preferred)
+        {
+            var list = new System.Collections.Generic.List<string>();
+            Action<string> add = m =>
+            {
+                if (!string.IsNullOrWhiteSpace(m) && !list.Contains(m))
+                    list.Add(m.Trim());
+            };
+            add(preferred);
+            add("gemini-3.5-flash");
+            add("gemini-flash-lite-latest");
+            add("gemini-3.5-flash-lite");
+            add("gemini-3.1-flash-lite");
+            add("gemini-flash-latest");
+            return list;
+        }
+
         /// <summary>
         /// Makes HTTP call to Gemini API.
         /// </summary>
-        private string CallGeminiApi(string prompt)
+        private string CallGeminiApi(string prompt, string modelName = null)
         {
             // Ensure TLS 1.2 is used (Google requires it)
             System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls12 | System.Net.SecurityProtocolType.Tls13;
 
-            var url = string.Format(GEMINI_API_ENDPOINT, Model, ApiKey);
+            var url = string.Format(GEMINI_API_ENDPOINT, modelName ?? Model, ApiKey);
 
             // Build JSON request body
             var requestBody = new

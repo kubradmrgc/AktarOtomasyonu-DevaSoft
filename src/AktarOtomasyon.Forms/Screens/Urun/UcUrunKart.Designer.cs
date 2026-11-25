@@ -120,10 +120,11 @@ namespace AktarOtomasyon.Forms.Screens.Urun
             //
             // tabControl
             //
-            this.tabControl.Location = new System.Drawing.Point(20, 20);
+            this.tabControl.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tabControl.Location = new System.Drawing.Point(0, 0);
             this.tabControl.Name = "tabControl";
             this.tabControl.SelectedTabPage = this.tabGenel;
-            this.tabControl.Size = new System.Drawing.Size(730, 590);
+            this.tabControl.Size = new System.Drawing.Size(770, 640);
             this.tabControl.TabIndex = 0;
             this.tabControl.TabPages.AddRange(new DevExpress.XtraTab.XtraTabPage[] {
             this.tabGenel,
@@ -686,16 +687,19 @@ namespace AktarOtomasyon.Forms.Screens.Urun
             this.grpAltIslemler.Controls.Add(this.btnKaydetVeKapat);
             this.grpAltIslemler.Controls.Add(this.btnKaydet);
             this.grpAltIslemler.Controls.Add(this.lblDurum);
-            this.grpAltIslemler.Location = new System.Drawing.Point(20, 620);
+            this.grpAltIslemler.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.grpAltIslemler.Location = new System.Drawing.Point(0, 640);
             this.grpAltIslemler.Name = "grpAltIslemler";
+            this.grpAltIslemler.Padding = new System.Windows.Forms.Padding(12, 8, 12, 8);
             this.grpAltIslemler.ShowCaption = false;
-            this.grpAltIslemler.Size = new System.Drawing.Size(730, 60);
+            this.grpAltIslemler.Size = new System.Drawing.Size(770, 60);
             this.grpAltIslemler.TabIndex = 1;
             //
             // lblDurum
             //
             this.lblDurum.Appearance.Font = new System.Drawing.Font("Tahoma", 10F, System.Drawing.FontStyle.Bold);
             this.lblDurum.Appearance.Options.UseFont = true;
+            this.lblDurum.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Top)));
             this.lblDurum.Location = new System.Drawing.Point(15, 20);
             this.lblDurum.Name = "lblDurum";
             this.lblDurum.Size = new System.Drawing.Size(75, 16);
@@ -704,9 +708,12 @@ namespace AktarOtomasyon.Forms.Screens.Urun
             //
             // btnKaydet
             //
+            this.btnKaydet.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnKaydet.Appearance.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(34)))), ((int)(((byte)(139)))), ((int)(((byte)(34)))));
+            this.btnKaydet.Appearance.ForeColor = System.Drawing.Color.White;
             this.btnKaydet.Appearance.Options.UseBackColor = true;
-            this.btnKaydet.Location = new System.Drawing.Point(490, 15);
+            this.btnKaydet.Appearance.Options.UseForeColor = true;
+            this.btnKaydet.Location = new System.Drawing.Point(520, 15);
             this.btnKaydet.Name = "btnKaydet";
             this.btnKaydet.Size = new System.Drawing.Size(110, 30);
             this.btnKaydet.TabIndex = 1;
@@ -715,9 +722,10 @@ namespace AktarOtomasyon.Forms.Screens.Urun
             //
             // btnKaydetVeKapat
             //
-            this.btnKaydetVeKapat.Location = new System.Drawing.Point(610, 15);
+            this.btnKaydetVeKapat.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnKaydetVeKapat.Location = new System.Drawing.Point(640, 15);
             this.btnKaydetVeKapat.Name = "btnKaydetVeKapat";
-            this.btnKaydetVeKapat.Size = new System.Drawing.Size(110, 30);
+            this.btnKaydetVeKapat.Size = new System.Drawing.Size(120, 30);
             this.btnKaydetVeKapat.TabIndex = 2;
             this.btnKaydetVeKapat.Text = "Kaydet ve Kapat";
             this.btnKaydetVeKapat.Click += new System.EventHandler(this.btnKaydetVeKapat_Click);
@@ -726,8 +734,9 @@ namespace AktarOtomasyon.Forms.Screens.Urun
             //
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(this.grpAltIslemler);
+            // Dock sırası: önce Fill (tab), sonra Bottom (kaydet çubuğu) — Bottom üstte kalır
             this.Controls.Add(this.tabControl);
+            this.Controls.Add(this.grpAltIslemler);
             this.Name = "UcUrunKart";
             this.Size = new System.Drawing.Size(770, 700);
             ((System.ComponentModel.ISupportInitialize)(this.tabControl)).EndInit();
